@@ -1,0 +1,2955 @@
+<!DOCTYPE html>
+<!--
+    Auto-Spielesammlung - Vollständig offline nutzbar!
+    Alle Daten (300+ Städte, 40+ Rätsel, 6 Spielmodi) sind in dieser Datei enthalten.
+    Einfach im Browser öffnen - kein Internet nötig!
+-->
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Handy-Spielesammlung - Spaß auf jeder Fahrt</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .score-board {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .score-item {
+            text-align: center;
+            flex: 1 1 auto;
+            min-width: 70px;
+        }
+
+        .score-label {
+            font-size: 0.8em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .score-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .game-area {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            min-height: 300px;
+            max-height: calc(100vh - 400px);
+            overflow-y: auto;
+            display: none;
+        }
+
+        .game-area.active {
+            display: block;
+        }
+
+        @media (max-width: 900px) and (min-width: 601px) {
+            /* Spezielle Einstellungen für Tablets (8-10 Zoll) */
+            body {
+                padding: 15px;
+            }
+            
+            .container {
+                max-width: 100%;
+            }
+            
+            h1 {
+                font-size: 1.6em;
+            }
+            
+            .game-area {
+                padding: 25px;
+                max-height: none;
+                overflow-y: visible;
+            }
+            
+            .question {
+                font-size: 1.6em;
+            }
+            
+            .answer-input {
+                font-size: 1.3em;
+                padding: 12px;
+            }
+            
+            .btn {
+                font-size: 1em;
+                padding: 12px 20px;
+            }
+            
+            .button-group {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                justify-content: center;
+            }
+            
+            .button-group .btn {
+                flex: 0 1 auto;
+                min-width: 100px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5em;
+            }
+            
+            .question {
+                font-size: 1.5em;
+            }
+            
+            .answer-input {
+                font-size: 1.2em;
+            }
+            
+            .license-plate {
+                font-size: 2em;
+            }
+            
+            .score-board {
+                padding: 10px;
+            }
+            
+            .score-value {
+                font-size: 1.2em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.3em;
+            }
+            
+            .subtitle {
+                font-size: 0.8em;
+            }
+            
+            .game-area {
+                padding: 20px;
+            }
+            
+            .btn {
+                padding: 12px;
+                font-size: 1em;
+            }
+        }
+
+        .question {
+            font-size: 2em;
+            text-align: center;
+            margin: 30px 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.5em;
+            border: 3px solid #667eea;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .voice-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            font-size: 2em;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+
+        .voice-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .voice-btn.listening {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .feedback {
+            text-align: center;
+            font-size: 1.5em;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: #4caf50;
+            color: white;
+            display: block;
+        }
+
+        .feedback.wrong {
+            background: #f44336;
+            color: white;
+            display: block;
+        }
+
+        .chain-calc {
+            font-size: 1.3em;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .chain-step {
+            display: inline-block;
+            margin: 5px;
+            padding: 10px 15px;
+            background: #f0f0f0;
+            border-radius: 8px;
+        }
+
+        .chain-current {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: bold;
+        }
+
+        .number-guess-info {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .distance {
+            font-size: 2em;
+            color: #f5576c;
+            font-weight: bold;
+        }
+
+        .riddle-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+        }
+
+        .license-plate {
+            font-size: 3em;
+            font-family: monospace;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            background: #ffd700;
+            border: 5px solid #333;
+            border-radius: 10px;
+            margin: 20px 0;
+            letter-spacing: 5px;
+        }
+
+        .settings {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .setting-item {
+            margin: 15px 0;
+        }
+
+        .setting-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        select, input[type="range"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .range-value {
+            display: inline-block;
+            margin-left: 10px;
+            font-weight: bold;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 Handy-Spielesammlung</h1>
+            <p class="subtitle">Mathe, Rätsel & Stadt-Land-Fluss für unterwegs!</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item">
+                <div class="score-label">Punkte</div>
+                <div class="score-value" id="score">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Richtig</div>
+                <div class="score-value" id="correct">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Serie</div>
+                <div class="score-value" id="streak">0</div>
+            </div>
+            <div class="score-item">
+                <button class="btn" id="backBtn" style="display: none; padding: 10px 20px; font-size: 1em; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); font-weight: bold;">
+                    ⬅️ Zurück
+                </button>
+            </div>
+        </div>
+
+        <div class="settings" id="settingsPanel">
+            <div class="setting-item">
+                <label class="setting-label">Spielmodus</label>
+                <select id="gameMode">
+                    <option value="">Spiel auswählen...</option>
+                    <option value="kennzeichenfinder">🚗 Kennzeichen-Finder (Live)</option>
+                    <option value="wortpuzzle">🔤 Wort-Puzzle</option>
+                    <option value="einmaleins">✖️ 1×1 Training</option>
+                    <option value="prozent">📊 Prozentrechnen</option>
+                    <option value="zahlenraten">🎯 Zahl erraten</option>
+                    <option value="kette">⛓️ Kettenrechnen</option>
+                    <option value="raetsel">🧩 Zahlenrätsel</option>
+                    <option value="kennzeichen">🚙 Kennzeichen-Rechnen</option>
+                    <option value="stadtlandfluss">🌍 Stadt Land Fluss</option>
+                    <option value="geschichten">📖 Geschichten erfinden</option>
+                    <option value="quiz">❓ Wissens-Quiz</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <label class="setting-label">Schwierigkeitsgrad</label>
+                <select id="difficulty">
+                    <option value="easy">Leicht</option>
+                    <option value="medium" selected>Mittel</option>
+                    <option value="hard">Schwer</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <label class="setting-label">Spracheinstellung</label>
+                <select id="speechSetting">
+                    <option value="volume">Lautstärke</option>
+                    <option value="rate">Geschwindigkeit</option>
+                    <option value="pitch">Tonhöhe</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <label class="setting-label">
+                    <span id="currentSettingLabel">Lautstärke:</span> <span class="range-value" id="currentValue">80%</span>
+                </label>
+                <input type="range" id="speechSlider" min="0" max="100" value="80">
+            </div>
+            <div class="setting-item">
+                <button class="btn btn-secondary" id="testSpeechBtn" style="width: 100%;">
+                    🔊 Sprachausgabe testen
+                </button>
+            </div>
+        </div>
+
+        <div class="game-area" id="gameArea">
+            <div class="question" id="question"></div>
+            <div id="gameContent"></div>
+            <div class="feedback" id="feedback"></div>
+            <button class="voice-btn" id="voiceBtn" title="Sprachsteuerung">🎤</button>
+            <input type="text" class="answer-input" id="answerInput" placeholder="Deine Antwort...">
+            <div class="button-group">
+                <button class="btn btn-primary" id="checkBtn">✓ Prüfen</button>
+                <button class="btn btn-secondary" id="hintBtn">💡 Tipp</button>
+                <button class="btn btn-secondary" id="solutionBtn">👁️ Lösung</button>
+                <button class="btn btn-secondary" id="skipBtn">⏭ Überspringen</button>
+                <button class="btn btn-secondary" id="newBtn">🔄 Neue</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Globale Variablen
+        let currentMode = null;
+        let currentQuestion = null;
+        let score = 0;
+        let correct = 0;
+        let streak = 0;
+        let isListening = false;
+        let recognition = null;
+        let speechSynthesis = window.speechSynthesis;
+        let isSpeechReady = false;
+        
+        // Spracheinstellungen speichern
+        let speechSettings = {
+            volume: 80,
+            rate: 110,
+            pitch: 105
+        };
+
+        // Zahlenrätsel-Datenbank
+        const riddles = [
+            {
+                question: "Ein Müller geht in seine Mühle. In jedem der vier Winkel sieht er drei Säcke, auf jedem Sack sitzen drei Katzen, und jede hat drei Junge. Wie viele Füße sind in der Mühle?",
+                answer: "2",
+                explanation: "Nur der Müller hat Füße (2 Stück). Katzen haben Pfoten, keine Füße!"
+            },
+            {
+                question: "100 Katzen fressen 100 Mäuse in 3 Minuten. Wie lange braucht eine Katze für eine Maus?",
+                answer: "3",
+                explanation: "3 Minuten - jede Katze arbeitet unabhängig!"
+            },
+            {
+                question: "Wenn fünf Söhne eine Schwester haben, wie viele Geschwister hat der jüngste Sohn?",
+                answer: "5",
+                explanation: "5 Geschwister - vier Brüder und eine Schwester!"
+            },
+            {
+                question: "Ein Bauer hat 17 Schafe. Alle bis auf 9 sterben. Wie viele Schafe hat er noch?",
+                answer: "9",
+                explanation: "9 Schafe - 'alle bis auf 9' bedeutet, dass 9 übrig bleiben!"
+            },
+            {
+                question: "Du hast ein Streichholz und betrittst einen Raum mit einer Kerze, einem Ofen und einer Laterne. Was zündest du zuerst an?",
+                answer: "streichholz",
+                explanation: "Das Streichholz natürlich!"
+            },
+            {
+                question: "Was wird beim Trocknen nass?",
+                answer: "handtuch",
+                explanation: "Das Handtuch!"
+            },
+            {
+                question: "Was hat Ozeane aber kein Wasser?",
+                answer: "weltkarte",
+                explanation: "Eine Weltkarte oder ein Globus!"
+            },
+            {
+                question: "Wo geht man durch ein Loch rein und durch zwei Löcher wieder raus?",
+                answer: "hose",
+                explanation: "Bei einer Hose!"
+            },
+            {
+                question: "Ein Mann fällt aus dem Fenster eines 30-stöckigen Wolkenkratzers auf die Straße. Ihm passiert nichts. Wie kann das sein?",
+                answer: "erdgeschoss",
+                explanation: "Das Fenster war im Erdgeschoss!"
+            },
+            {
+                question: "Was spricht ohne Mund, hört ohne Ohren und antwortet in allen Sprachen der Welt?",
+                answer: "echo",
+                explanation: "Das Echo!"
+            },
+            {
+                question: "Wie viele Seiten hat ein Kreis?",
+                answer: "2",
+                explanation: "Zwei - eine Innenseite und eine Außenseite!"
+            },
+            {
+                question: "Vor dir liegen 3 Äpfel, du nimmst 2 weg. Wie viele Äpfel hast du dann?",
+                answer: "2",
+                explanation: "Zwei! Die zwei, die du dir genommen hast natürlich!"
+            },
+            {
+                question: "Ein Arzt gibt dir 3 Pillen, die du jede halbe Stunde einnehmen sollst. Wie lange dauert es minimal, bis du alle drei Pillen eingenommen hast?",
+                answer: "1",
+                explanation: "Eine Stunde! Eine nimmst du sofort, nach einer halben Stunde die zweite und die dritte nach einer Stunde."
+            },
+            {
+                question: "Wie oft kann man die 1 von der 17 abziehen?",
+                answer: "1",
+                explanation: "Nur einmal, denn danach ist es die 16!"
+            },
+            {
+                question: "Auf einer Stromleitung sitzen 10 Vögel, ein Jäger erschießt 3 davon. Wie viele Vögel sitzen noch darauf?",
+                answer: "0",
+                explanation: "Keiner, die anderen sind beim Knall weggeflogen!"
+            },
+            {
+                question: "Bei einem Marathon überholst du kurz vorm Ziel den Zweiten. Welchen Platz machst du?",
+                answer: "2",
+                explanation: "Den zweiten! Den Ersten hast du ja nicht überholt."
+            },
+            {
+                question: "Wie viele Monate haben 28 Tage?",
+                answer: "12",
+                explanation: "Alle! Nur manche eben mehr."
+            },
+            {
+                question: "Was wird größer, wenn man etwas davon wegnimmt?",
+                answer: "loch",
+                explanation: "Ein Loch!"
+            },
+            {
+                question: "Was hat 6 Füße und singt sogar mehrstimmig?",
+                answer: "trio",
+                explanation: "Ein Gesangstrio!"
+            },
+            {
+                question: "Was ist schwerer - 1 kg Federn oder 1 kg Stahl?",
+                answer: "gleich",
+                explanation: "Beides ist gleich schwer: 1 kg!"
+            },
+            {
+                question: "Was sagt der große Stift zum kleinen Stift?",
+                answer: "wachsmalstift",
+                explanation: "Wachs mal, Stift!"
+            },
+            {
+                question: "Was hat vier Buchstaben, fängt mit Po an und man kann darauf sitzen?",
+                answer: "pony",
+                explanation: "Ein Pony!"
+            },
+            {
+                question: "Welcher Berg war der höchste der Welt bevor der Mount Everest entdeckt wurde?",
+                answer: "everest",
+                explanation: "Natürlich der Mount Everest. Er war nur noch nicht entdeckt!"
+            },
+            {
+                question: "Was passiert mit einem weißen Stein, wenn man ihn ins Rote Meer wirft?",
+                answer: "nass",
+                explanation: "Er wird nass!"
+            },
+            {
+                question: "Welches Brot kann man nicht zum Frühstück essen?",
+                answer: "abendbrot",
+                explanation: "Das Abendbrot!"
+            },
+            {
+                question: "Was kann man weitergeben und gleichzeitig behalten?",
+                answer: "erkältung",
+                explanation: "Eine Erkältung!"
+            },
+            {
+                question: "Was ist bei der Maus groß und beim Kamel klein?",
+                answer: "m",
+                explanation: "Das M!"
+            },
+            {
+                question: "Wie viel Erde liegt in einem 50 cm tiefen und 40 cm breiten Erdloch, wenn es ganz gefüllt ist?",
+                answer: "0",
+                explanation: "Keine, denn wenn es ganz gefüllt ist, gibt es kein Loch mehr!"
+            },
+            {
+                question: "Welchen Tisch kann man essen?",
+                answer: "nachtisch",
+                explanation: "Den Nachtisch!"
+            },
+            {
+                question: "Was ist ein Keks unter einem Baum?",
+                answer: "plätzchen",
+                explanation: "Ein schattiges Plätzchen!"
+            },
+            {
+                question: "Wie nennt man die Steigerung von Buchstabensuppe?",
+                answer: "wörtersee",
+                explanation: "Wörtersee!"
+            },
+            {
+                question: "Welches Tier versteckt sich im Kaffee?",
+                answer: "affe",
+                explanation: "Ein Affe!"
+            },
+            {
+                question: "Was hat zwei Flügel, aber kann nicht fliegen und hat einen Rücken, aber kann nicht liegen?",
+                answer: "nase",
+                explanation: "Die Nase!"
+            },
+            {
+                question: "Was hat Federn, aber keine Flügel?",
+                answer: "bett",
+                explanation: "Ein Federbett oder Kopfkissen!"
+            },
+            {
+                question: "Was hat vier Beine aber kann dennoch nicht laufen?",
+                answer: "tisch",
+                explanation: "Ein Tisch!"
+            },
+            {
+                question: "Welcher Stuhl bewegt sich den ganzen Tag hoch und runter?",
+                answer: "fahrstuhl",
+                explanation: "Der Fahrstuhl!"
+            },
+            {
+                question: "Was bleibt immer in der Ecke und reist dennoch um die Welt?",
+                answer: "briefmarke",
+                explanation: "Eine Briefmarke!"
+            },
+            {
+                question: "Wer geht immer mit dir baden, aber wird nie nass?",
+                answer: "schatten",
+                explanation: "Dein Schatten!"
+            },
+            {
+                question: "Welcher Mann wird in der Sonne immer kleiner?",
+                answer: "schneemann",
+                explanation: "Der Schneemann!"
+            },
+            {
+                question: "Welches Tier ist am stärksten?",
+                answer: "schnecke",
+                explanation: "Die Schnecke! Sie kann ein ganzes Haus tragen!"
+            }
+        ];
+
+        // Stadt-Land-Fluss Datenbank
+        const stadtLandFlussData = {
+            kategorien: ['Stadt', 'Land', 'Fluss', 'Tier', 'Pflanze', 'Beruf', 'Name'],
+            
+            antworten: {
+                'A': {
+                    Stadt: ['Amsterdam', 'Athen', 'Augsburg', 'Aachen'],
+                    Land: ['Afghanistan', 'Ägypten', 'Albanien', 'Algerien', 'Argentinien', 'Australien'],
+                    Fluss: ['Amazonas', 'Aller', 'Altmühl'],
+                    Tier: ['Aal', 'Affe', 'Ameise', 'Amsel', 'Antilope'],
+                    Pflanze: ['Apfelbaum', 'Ahorn', 'Aloe', 'Aster'],
+                    Beruf: ['Arzt', 'Apotheker', 'Anwalt', 'Astronaut'],
+                    Name: ['Anna', 'Anton', 'Alexander', 'Andrea']
+                },
+                'B': {
+                    Stadt: ['Berlin', 'Bonn', 'Bremen', 'Bern', 'Barcelona'],
+                    Land: ['Belgien', 'Brasilien', 'Bulgarien'],
+                    Fluss: ['Bodensee', 'Brahmaputra'],
+                    Tier: ['Bär', 'Biene', 'Biber', 'Büffel'],
+                    Pflanze: ['Birke', 'Buche', 'Bambus', 'Bohne'],
+                    Beruf: ['Bäcker', 'Bauarbeiter', 'Bibliothekar'],
+                    Name: ['Ben', 'Bernd', 'Beate', 'Barbara']
+                },
+                'C': {
+                    Stadt: ['Cottbus', 'Chemnitz', 'Chicago'],
+                    Land: ['China', 'Chile', 'Costa Rica'],
+                    Fluss: ['Colorado'],
+                    Tier: ['Chamäleon', 'Chinchilla'],
+                    Pflanze: ['Chrysantheme'],
+                    Beruf: ['Chemiker', 'Chirurg'],
+                    Name: ['Clara', 'Christian', 'Charlotte']
+                },
+                'D': {
+                    Stadt: ['Dresden', 'Dortmund', 'Düsseldorf', 'Dublin'],
+                    Land: ['Deutschland', 'Dänemark'],
+                    Fluss: ['Donau', 'Dnjepr'],
+                    Tier: ['Dachs', 'Delfin', 'Dromedar'],
+                    Pflanze: ['Dahlie', 'Distel'],
+                    Beruf: ['Dachdecker', 'Designer'],
+                    Name: ['David', 'Daniel', 'Diana']
+                },
+                'E': {
+                    Stadt: ['Erfurt', 'Essen', 'Edinburgh'],
+                    Land: ['England', 'Ecuador', 'Estland'],
+                    Fluss: ['Elbe', 'Ems', 'Euphrat'],
+                    Tier: ['Esel', 'Elefant', 'Ente', 'Eichhörnchen'],
+                    Pflanze: ['Eiche', 'Efeu', 'Erdbeere'],
+                    Beruf: ['Elektriker', 'Erzieher'],
+                    Name: ['Emma', 'Emil', 'Erika']
+                },
+                'F': {
+                    Stadt: ['Frankfurt', 'Freiburg', 'Florenz'],
+                    Land: ['Frankreich', 'Finnland'],
+                    Fluss: ['Fulda', 'Freiberger Mulde'],
+                    Tier: ['Fuchs', 'Fisch', 'Flamingo', 'Frosch'],
+                    Pflanze: ['Fichte', 'Farn', 'Flieder'],
+                    Beruf: ['Feuerwehrmann', 'Fotograf', 'Förster'],
+                    Name: ['Felix', 'Franz', 'Franziska']
+                },
+                'G': {
+                    Stadt: ['Göttingen', 'Genf', 'Graz'],
+                    Land: ['Griechenland', 'Guatemala'],
+                    Fluss: ['Ganges'],
+                    Tier: ['Giraffe', 'Gorilla', 'Gans', 'Gecko'],
+                    Pflanze: ['Gänseblümchen', 'Geranie'],
+                    Beruf: ['Gärtner', 'Geiger'],
+                    Name: ['Georg', 'Greta', 'Gustav']
+                },
+                'H': {
+                    Stadt: ['Hamburg', 'Hannover', 'Helsinki'],
+                    Land: ['Honduras', 'Haiti'],
+                    Fluss: ['Havel'],
+                    Tier: ['Hund', 'Hase', 'Hamster', 'Hirsch'],
+                    Pflanze: ['Haselnuss', 'Hyazinthe'],
+                    Beruf: ['Hausmeister', 'Hebamme'],
+                    Name: ['Hannah', 'Hans', 'Henrik']
+                },
+                'I': {
+                    Stadt: ['Innsbruck', 'Istanbul'],
+                    Land: ['Italien', 'Indien', 'Irland', 'Island', 'Israel'],
+                    Fluss: ['Isar', 'Inn', 'Indus'],
+                    Tier: ['Igel', 'Iltis'],
+                    Pflanze: ['Iris'],
+                    Beruf: ['Informatiker', 'Ingenieur'],
+                    Name: ['Ida', 'Ilse', 'Ingo']
+                },
+                'J': {
+                    Stadt: ['Jena', 'Jerusalem'],
+                    Land: ['Japan', 'Jordanien', 'Jamaika'],
+                    Fluss: ['Jangtse'],
+                    Tier: ['Jaguar'],
+                    Pflanze: ['Jasmin'],
+                    Beruf: ['Journalist', 'Jäger'],
+                    Name: ['Jonas', 'Julia', 'Jakob']
+                },
+                'K': {
+                    Stadt: ['Köln', 'Kiel', 'Kopenhagen'],
+                    Land: ['Kanada', 'Kuba', 'Kroatien'],
+                    Fluss: ['Kongo'],
+                    Tier: ['Katze', 'Krokodil', 'Kamel', 'Känguru'],
+                    Pflanze: ['Kiefer', 'Kirschbaum', 'Klee'],
+                    Beruf: ['Koch', 'Krankenpfleger', 'Kellner'],
+                    Name: ['Karl', 'Katharina', 'Klaus']
+                },
+                'L': {
+                    Stadt: ['Leipzig', 'Lübeck', 'Lissabon', 'London'],
+                    Land: ['Lettland', 'Litauen', 'Luxemburg'],
+                    Fluss: ['Lech', 'Lahn', 'Loire'],
+                    Tier: ['Löwe', 'Luchs', 'Leopard'],
+                    Pflanze: ['Linde', 'Lavendel', 'Lilie'],
+                    Beruf: ['Lehrer', 'Landwirt'],
+                    Name: ['Laura', 'Leon', 'Lisa']
+                },
+                'M': {
+                    Stadt: ['München', 'Mainz', 'Madrid', 'Moskau'],
+                    Land: ['Mexiko', 'Monaco', 'Marokko'],
+                    Fluss: ['Main', 'Mosel', 'Mekong', 'Mississippi'],
+                    Tier: ['Maus', 'Marienkäfer', 'Möwe'],
+                    Pflanze: ['Maiglöckchen', 'Margerite'],
+                    Beruf: ['Maler', 'Mechaniker', 'Musiker'],
+                    Name: ['Maria', 'Max', 'Martin']
+                },
+                'N': {
+                    Stadt: ['Nürnberg', 'Neapel', 'New York'],
+                    Land: ['Norwegen', 'Niederlande', 'Neuseeland', 'Nigeria'],
+                    Fluss: ['Neckar', 'Nil', 'Niger'],
+                    Tier: ['Nashorn', 'Nachtigall'],
+                    Pflanze: ['Nelke', 'Narzisse'],
+                    Beruf: ['Notar'],
+                    Name: ['Nina', 'Noah', 'Niklas']
+                },
+                'O': {
+                    Stadt: ['Osnabrück', 'Oslo', 'Ottawa'],
+                    Land: ['Österreich', 'Oman'],
+                    Fluss: ['Oder', 'Oker'],
+                    Tier: ['Otter', 'Ochse', 'Orang-Utan'],
+                    Pflanze: ['Olive', 'Orchidee'],
+                    Beruf: ['Optiker'],
+                    Name: ['Oliver', 'Otto', 'Olga']
+                },
+                'P': {
+                    Stadt: ['Potsdam', 'Prag', 'Paris'],
+                    Land: ['Polen', 'Portugal', 'Peru', 'Pakistan'],
+                    Fluss: ['Pegnitz'],
+                    Tier: ['Pferd', 'Pinguin', 'Panda', 'Papagei'],
+                    Pflanze: ['Palme', 'Petunie'],
+                    Beruf: ['Pilot', 'Polizist', 'Postbote'],
+                    Name: ['Paul', 'Paula', 'Peter']
+                },
+                'R': {
+                    Stadt: ['Rostock', 'Regensburg', 'Rom', 'Rio'],
+                    Land: ['Russland', 'Rumänien'],
+                    Fluss: ['Rhein', 'Rhone', 'Ruhr'],
+                    Tier: ['Reh', 'Ratte', 'Rabe'],
+                    Pflanze: ['Rose', 'Rotkohl'],
+                    Beruf: ['Richter', 'Rezeptionist'],
+                    Name: ['Robert', 'Rosa', 'Richard']
+                },
+                'S': {
+                    Stadt: ['Stuttgart', 'Salzburg', 'Stockholm'],
+                    Land: ['Schweiz', 'Schweden', 'Spanien', 'Slowakei'],
+                    Fluss: ['Saale', 'Seine', 'Spree'],
+                    Tier: ['Schaf', 'Schildkröte', 'Spinne', 'Storch'],
+                    Pflanze: ['Sonnenblume', 'Schlüsselblume'],
+                    Beruf: ['Schreiner', 'Schneider', 'Sekretär'],
+                    Name: ['Sarah', 'Simon', 'Sophie']
+                },
+                'T': {
+                    Stadt: ['Tübingen', 'Tokio', 'Toronto'],
+                    Land: ['Türkei', 'Tschechien', 'Thailand', 'Tunesien'],
+                    Fluss: ['Themse', 'Tiber'],
+                    Tier: ['Tiger', 'Taube', 'Truthahn'],
+                    Pflanze: ['Tanne', 'Tulpe', 'Trauerweide'],
+                    Beruf: ['Tierarzt', 'Taxifahrer', 'Tischler'],
+                    Name: ['Tim', 'Tom', 'Theresa']
+                },
+                'U': {
+                    Stadt: ['Ulm', 'Utrecht'],
+                    Land: ['Ukraine', 'Uruguay', 'Uganda', 'USA'],
+                    Fluss: ['Unstrut'],
+                    Tier: ['Uhu'],
+                    Pflanze: ['Ulme'],
+                    Beruf: ['Uhrmacher'],
+                    Name: ['Ulrich', 'Ute', 'Ursula']
+                },
+                'V': {
+                    Stadt: ['Venedig', 'Vancouver', 'Wien'],
+                    Land: ['Venezuela', 'Vietnam'],
+                    Fluss: ['Volga'],
+                    Tier: ['Vogel'],
+                    Pflanze: ['Veilchen'],
+                    Beruf: ['Verkäufer', 'Versicherungsvertreter'],
+                    Name: ['Valentin', 'Vera', 'Viktor']
+                },
+                'W': {
+                    Stadt: ['Wiesbaden', 'Würzburg', 'Warschau', 'Wien'],
+                    Land: ['Wales'],
+                    Fluss: ['Weser', 'Werra', 'Wolga'],
+                    Tier: ['Wal', 'Wolf', 'Waschbär', 'Wildschwein'],
+                    Pflanze: ['Weide', 'Walnuss'],
+                    Beruf: ['Wächter', 'Winzer'],
+                    Name: ['Werner', 'Wilhelm', 'Wilma']
+                },
+                'Z': {
+                    Stadt: ['Zürich', 'Zagreb'],
+                    Land: ['Zypern'],
+                    Fluss: ['Zwickauer Mulde'],
+                    Tier: ['Zebra', 'Ziege'],
+                    Pflanze: ['Zypresse', 'Zitrone'],
+                    Beruf: ['Zahnarzt', 'Zimmermann'],
+                    Name: ['Zoe', 'Zacharias']
+                }
+            }
+        };
+        
+        // Geschichten-Erzähler Datenbank
+        const geschichtenData = {
+            personen: ['Prinzessin', 'Ritter', 'Drache', 'Hexe', 'Zauberer', 'König', 'Pirat', 'Detektiv', 'Astronaut', 'Roboter', 'Fee', 'Zwerg', 'Riese', 'Ninja', 'Cowboy', 'Meerjungfrau', 'Einhorn', 'Vampir', 'Geist', 'Superheld'],
+            orte: ['Schloss', 'Wald', 'Höhle', 'Insel', 'Berg', 'Meer', 'Wüste', 'Dschungel', 'Stadt', 'Dorf', 'Burg', 'Turm', 'Schule', 'Bauernhof', 'Weltraum', 'Unterwasser', 'Wolken', 'Eisberg', 'Vulkan', 'Labor'],
+            dinge: ['Schatzkiste', 'Zauberstab', 'Schwert', 'Krone', 'Buch', 'Schlüssel', 'Karte', 'Ring', 'Amulett', 'Spiegel', 'Flasche', 'Teppich', 'Laterne', 'Kompass', 'Fernrohr', 'Rucksack', 'Brief', 'Münze', 'Feder', 'Kristall'],
+            tiere: ['Pferd', 'Hund', 'Katze', 'Vogel', 'Fisch', 'Eule', 'Wolf', 'Bär', 'Löwe', 'Elefant', 'Delfin', 'Adler', 'Fuchs', 'Hase', 'Eichhörnchen', 'Papagei', 'Schlange', 'Schildkröte', 'Schmetterling', 'Frosch'],
+            eigenschaften: ['mutig', 'klug', 'lustig', 'geheimnisvoll', 'magisch', 'gefährlich', 'freundlich', 'alt', 'winzig', 'riesig', 'schnell', 'langsam', 'bunt', 'unsichtbar', 'glänzend', 'verzaubert', 'vergessen', 'versteckt', 'verloren', 'wertvoll'],
+            aktionen: ['finden', 'verlieren', 'suchen', 'retten', 'fliegen', 'schwimmen', 'klettern', 'rennen', 'kämpfen', 'tanzen', 'singen', 'lachen', 'weinen', 'träumen', 'verwandeln', 'erschrecken', 'helfen', 'entdecken', 'erfinden', 'verzaubern']
+        };
+        
+        // Deutsche Autokennzeichen (VOLLSTÄNDIG aus KBA-Liste - 300+ Städte!)
+        const licensePlates = [
+            { code: "A", city: "Augsburg", state: "Bayern" },
+            { code: "AA", city: "Aalen", state: "Baden-Württemberg" },
+            { code: "AB", city: "Aschaffenburg", state: "Bayern" },
+            { code: "ABG", city: "Altenburg", state: "Thüringen" },
+            { code: "AC", city: "Aachen", state: "Nordrhein-Westfalen" },
+            { code: "AIC", city: "Aichach", state: "Bayern" },
+            { code: "AM", city: "Amberg", state: "Bayern" },
+            { code: "AN", city: "Ansbach", state: "Bayern" },
+            { code: "AÖ", city: "Altötting", state: "Bayern" },
+            { code: "AUR", city: "Aurich", state: "Niedersachsen" },
+            { code: "AW", city: "Ahrweiler", state: "Rheinland-Pfalz" },
+            { code: "AZ", city: "Alzey", state: "Rheinland-Pfalz" },
+            { code: "B", city: "Berlin", state: "Berlin" },
+            { code: "BA", city: "Bamberg", state: "Bayern" },
+            { code: "BAD", city: "Baden-Baden", state: "Baden-Württemberg" },
+            { code: "BB", city: "Böblingen", state: "Baden-Württemberg" },
+            { code: "BC", city: "Biberach", state: "Baden-Württemberg" },
+            { code: "BGL", city: "Berchtesgaden", state: "Bayern" },
+            { code: "BI", city: "Bielefeld", state: "Nordrhein-Westfalen" },
+            { code: "BIT", city: "Bitburg", state: "Rheinland-Pfalz" },
+            { code: "BN", city: "Bonn", state: "Nordrhein-Westfalen" },
+            { code: "BO", city: "Bochum", state: "Nordrhein-Westfalen" },
+            { code: "BOT", city: "Bottrop", state: "Nordrhein-Westfalen" },
+            { code: "BRA", city: "Brake", state: "Niedersachsen" },
+            { code: "BS", city: "Braunschweig", state: "Niedersachsen" },
+            { code: "BT", city: "Bayreuth", state: "Bayern" },
+            { code: "BZ", city: "Bautzen", state: "Sachsen" },
+            { code: "C", city: "Chemnitz", state: "Sachsen" },
+            { code: "CB", city: "Cottbus", state: "Brandenburg" },
+            { code: "CE", city: "Celle", state: "Niedersachsen" },
+            { code: "CHA", city: "Cham", state: "Bayern" },
+            { code: "CLP", city: "Cloppenburg", state: "Niedersachsen" },
+            { code: "CO", city: "Coburg", state: "Bayern" },
+            { code: "COC", city: "Cochem", state: "Rheinland-Pfalz" },
+            { code: "COE", city: "Coesfeld", state: "Nordrhein-Westfalen" },
+            { code: "CUX", city: "Cuxhaven", state: "Niedersachsen" },
+            { code: "CW", city: "Calw", state: "Baden-Württemberg" },
+            { code: "D", city: "Düsseldorf", state: "Nordrhein-Westfalen" },
+            { code: "DA", city: "Darmstadt", state: "Hessen" },
+            { code: "DAH", city: "Dachau", state: "Bayern" },
+            { code: "DD", city: "Dresden", state: "Sachsen" },
+            { code: "DE", city: "Dessau", state: "Sachsen-Anhalt" },
+            { code: "DEG", city: "Deggendorf", state: "Bayern" },
+            { code: "DEL", city: "Delmenhorst", state: "Niedersachsen" },
+            { code: "DGF", city: "Dingolfing", state: "Bayern" },
+            { code: "DH", city: "Diepholz", state: "Niedersachsen" },
+            { code: "DIL", city: "Dillenburg", state: "Hessen" },
+            { code: "DLG", city: "Dillingen", state: "Bayern" },
+            { code: "DN", city: "Düren", state: "Nordrhein-Westfalen" },
+            { code: "DO", city: "Dortmund", state: "Nordrhein-Westfalen" },
+            { code: "DON", city: "Donauwörth", state: "Bayern" },
+            { code: "DU", city: "Duisburg", state: "Nordrhein-Westfalen" },
+            { code: "DÜW", city: "Bad Dürkheim", state: "Rheinland-Pfalz" },
+            { code: "E", city: "Essen", state: "Nordrhein-Westfalen" },
+            { code: "EBE", city: "Ebersberg", state: "Bayern" },
+            { code: "ED", city: "Erding", state: "Bayern" },
+            { code: "EF", city: "Erfurt", state: "Thüringen" },
+            { code: "EI", city: "Eichstätt", state: "Bayern" },
+            { code: "EIC", city: "Eichsfeld", state: "Thüringen" },
+            { code: "EL", city: "Emsland", state: "Niedersachsen" },
+            { code: "EM", city: "Emmendingen", state: "Baden-Württemberg" },
+            { code: "EMD", city: "Emden", state: "Niedersachsen" },
+            { code: "EN", city: "Ennepe", state: "Nordrhein-Westfalen" },
+            { code: "ER", city: "Erlangen", state: "Bayern" },
+            { code: "ES", city: "Esslingen", state: "Baden-Württemberg" },
+            { code: "EU", city: "Euskirchen", state: "Nordrhein-Westfalen" },
+            { code: "F", city: "Frankfurt", state: "Hessen" },
+            { code: "FB", city: "Friedberg", state: "Hessen" },
+            { code: "FD", city: "Fulda", state: "Hessen" },
+            { code: "FDS", city: "Freudenstadt", state: "Baden-Württemberg" },
+            { code: "FF", city: "Frankfurt Oder", state: "Brandenburg" },
+            { code: "FFB", city: "Fürstenfeldbruck", state: "Bayern" },
+            { code: "FL", city: "Flensburg", state: "Schleswig-Holstein" },
+            { code: "FN", city: "Friedrichshafen", state: "Baden-Württemberg" },
+            { code: "FO", city: "Forchheim", state: "Bayern" },
+            { code: "FR", city: "Freiburg", state: "Baden-Württemberg" },
+            { code: "FRG", city: "Freyung", state: "Bayern" },
+            { code: "FRI", city: "Friesland", state: "Niedersachsen" },
+            { code: "FS", city: "Freising", state: "Bayern" },
+            { code: "FT", city: "Frankenthal", state: "Rheinland-Pfalz" },
+            { code: "FÜ", city: "Fürth", state: "Bayern" },
+            { code: "FÜS", city: "Füssen", state: "Bayern" },
+            { code: "G", city: "Gera", state: "Thüringen" },
+            { code: "GAP", city: "Garmisch", state: "Bayern" },
+            { code: "GE", city: "Gelsenkirchen", state: "Nordrhein-Westfalen" },
+            { code: "GER", city: "Germersheim", state: "Rheinland-Pfalz" },
+            { code: "GF", city: "Gifhorn", state: "Niedersachsen" },
+            { code: "GG", city: "Groß-Gerau", state: "Hessen" },
+            { code: "GI", city: "Gießen", state: "Hessen" },
+            { code: "GL", city: "Bergisch Gladbach", state: "Nordrhein-Westfalen" },
+            { code: "GM", city: "Gummersbach", state: "Nordrhein-Westfalen" },
+            { code: "GÖ", city: "Göttingen", state: "Niedersachsen" },
+            { code: "GP", city: "Göppingen", state: "Baden-Württemberg" },
+            { code: "GR", city: "Görlitz", state: "Sachsen" },
+            { code: "GS", city: "Goslar", state: "Niedersachsen" },
+            { code: "GT", city: "Gütersloh", state: "Nordrhein-Westfalen" },
+            { code: "GTH", city: "Gotha", state: "Thüringen" },
+            { code: "GÜ", city: "Güstrow", state: "Mecklenburg-Vorpommern" },
+            { code: "GUN", city: "Gunzenhausen", state: "Bayern" },
+            { code: "GZ", city: "Günzburg", state: "Bayern" },
+            { code: "H", city: "Hannover", state: "Niedersachsen" },
+            { code: "HA", city: "Hagen", state: "Nordrhein-Westfalen" },
+            { code: "HAL", city: "Halle", state: "Sachsen-Anhalt" },
+            { code: "HAM", city: "Hamm", state: "Nordrhein-Westfalen" },
+            { code: "HAS", city: "Haßfurt", state: "Bayern" },
+            { code: "HB", city: "Bremen", state: "Bremen" },
+            { code: "HBN", city: "Hildburghausen", state: "Thüringen" },
+            { code: "HD", city: "Heidelberg", state: "Baden-Württemberg" },
+            { code: "HDH", city: "Heidenheim", state: "Baden-Württemberg" },
+            { code: "HE", city: "Helmstedt", state: "Niedersachsen" },
+            { code: "HEF", city: "Hersfeld", state: "Hessen" },
+            { code: "HEI", city: "Heide", state: "Schleswig-Holstein" },
+            { code: "HER", city: "Herne", state: "Nordrhein-Westfalen" },
+            { code: "HF", city: "Herford", state: "Nordrhein-Westfalen" },
+            { code: "HG", city: "Bad Homburg", state: "Hessen" },
+            { code: "HH", city: "Hamburg", state: "Hamburg" },
+            { code: "HI", city: "Hildesheim", state: "Niedersachsen" },
+            { code: "HIP", city: "Hilpoltstein", state: "Bayern" },
+            { code: "HL", city: "Lübeck", state: "Schleswig-Holstein" },
+            { code: "HM", city: "Hameln", state: "Niedersachsen" },
+            { code: "HN", city: "Heilbronn", state: "Baden-Württemberg" },
+            { code: "HO", city: "Hof", state: "Bayern" },
+            { code: "HOL", city: "Holzminden", state: "Niedersachsen" },
+            { code: "HRO", city: "Rostock", state: "Mecklenburg-Vorpommern" },
+            { code: "HS", city: "Heinsberg", state: "Nordrhein-Westfalen" },
+            { code: "HSK", city: "Hochsauerland", state: "Nordrhein-Westfalen" },
+            { code: "HST", city: "Stralsund", state: "Mecklenburg-Vorpommern" },
+            { code: "HU", city: "Hanau", state: "Hessen" },
+            { code: "HWI", city: "Wismar", state: "Mecklenburg-Vorpommern" },
+            { code: "HX", city: "Höxter", state: "Nordrhein-Westfalen" },
+            { code: "HZ", city: "Harz", state: "Sachsen-Anhalt" },
+            { code: "IGB", city: "St. Ingbert", state: "Saarland" },
+            { code: "IK", city: "Ilmenau", state: "Thüringen" },
+            { code: "IL", city: "Ilmenau", state: "Thüringen" },
+            { code: "ILL", city: "Illertissen", state: "Bayern" },
+            { code: "IN", city: "Ingolstadt", state: "Bayern" },
+            { code: "IZ", city: "Itzehoe", state: "Schleswig-Holstein" },
+            { code: "J", city: "Jena", state: "Thüringen" },
+            { code: "K", city: "Köln", state: "Nordrhein-Westfalen" },
+            { code: "KA", city: "Karlsruhe", state: "Baden-Württemberg" },
+            { code: "KC", city: "Kronach", state: "Bayern" },
+            { code: "KE", city: "Kempten", state: "Bayern" },
+            { code: "KEH", city: "Kelheim", state: "Bayern" },
+            { code: "KF", city: "Kaufbeuren", state: "Bayern" },
+            { code: "KH", city: "Bad Kreuznach", state: "Rheinland-Pfalz" },
+            { code: "KI", city: "Kiel", state: "Schleswig-Holstein" },
+            { code: "KL", city: "Kaiserslautern", state: "Rheinland-Pfalz" },
+            { code: "KLE", city: "Kleve", state: "Nordrhein-Westfalen" },
+            { code: "KN", city: "Konstanz", state: "Baden-Württemberg" },
+            { code: "KO", city: "Koblenz", state: "Rheinland-Pfalz" },
+            { code: "KR", city: "Krefeld", state: "Nordrhein-Westfalen" },
+            { code: "KS", city: "Kassel", state: "Hessen" },
+            { code: "KT", city: "Kitzingen", state: "Bayern" },
+            { code: "KU", city: "Kulmbach", state: "Bayern" },
+            { code: "KUS", city: "Kusel", state: "Rheinland-Pfalz" },
+            { code: "L", city: "Leipzig", state: "Sachsen" },
+            { code: "LA", city: "Landshut", state: "Bayern" },
+            { code: "LB", city: "Ludwigsburg", state: "Baden-Württemberg" },
+            { code: "LD", city: "Landau", state: "Rheinland-Pfalz" },
+            { code: "LDK", city: "Lahn-Dill", state: "Hessen" },
+            { code: "LER", city: "Leer", state: "Niedersachsen" },
+            { code: "LEV", city: "Leverkusen", state: "Nordrhein-Westfalen" },
+            { code: "LG", city: "Lüneburg", state: "Niedersachsen" },
+            { code: "LI", city: "Lindau", state: "Bayern" },
+            { code: "LIF", city: "Lichtenfels", state: "Bayern" },
+            { code: "LIP", city: "Lippe", state: "Nordrhein-Westfalen" },
+            { code: "LL", city: "Landsberg", state: "Bayern" },
+            { code: "LM", city: "Limburg", state: "Hessen" },
+            { code: "LÖ", city: "Lörrach", state: "Baden-Württemberg" },
+            { code: "LU", city: "Ludwigshafen", state: "Rheinland-Pfalz" },
+            { code: "M", city: "München", state: "Bayern" },
+            { code: "MA", city: "Mannheim", state: "Baden-Württemberg" },
+            { code: "MAK", city: "Marktredwitz", state: "Bayern" },
+            { code: "MB", city: "Miesbach", state: "Bayern" },
+            { code: "MD", city: "Magdeburg", state: "Sachsen-Anhalt" },
+            { code: "ME", city: "Mettmann", state: "Nordrhein-Westfalen" },
+            { code: "MEI", city: "Meißen", state: "Sachsen" },
+            { code: "MG", city: "Mönchengladbach", state: "Nordrhein-Westfalen" },
+            { code: "MH", city: "Mülheim", state: "Nordrhein-Westfalen" },
+            { code: "MI", city: "Minden", state: "Nordrhein-Westfalen" },
+            { code: "MIL", city: "Miltenberg", state: "Bayern" },
+            { code: "MK", city: "Märkischer Kreis", state: "Nordrhein-Westfalen" },
+            { code: "MM", city: "Memmingen", state: "Bayern" },
+            { code: "MO", city: "Moers", state: "Nordrhein-Westfalen" },
+            { code: "MR", city: "Marburg", state: "Hessen" },
+            { code: "MS", city: "Münster", state: "Nordrhein-Westfalen" },
+            { code: "MSP", city: "Main-Spessart", state: "Bayern" },
+            { code: "MÜ", city: "Mühldorf", state: "Bayern" },
+            { code: "MZ", city: "Mainz", state: "Rheinland-Pfalz" },
+            { code: "N", city: "Nürnberg", state: "Bayern" },
+            { code: "NB", city: "Neubrandenburg", state: "Mecklenburg-Vorpommern" },
+            { code: "ND", city: "Neuburg", state: "Bayern" },
+            { code: "NDH", city: "Nordhausen", state: "Thüringen" },
+            { code: "NE", city: "Neuss", state: "Nordrhein-Westfalen" },
+            { code: "NEA", city: "Neustadt Aisch", state: "Bayern" },
+            { code: "NES", city: "Bad Neustadt", state: "Bayern" },
+            { code: "NEW", city: "Neustadt Waldnaab", state: "Bayern" },
+            { code: "NF", city: "Nordfriesland", state: "Schleswig-Holstein" },
+            { code: "NH", city: "Neuhaus", state: "Thüringen" },
+            { code: "NI", city: "Nienburg", state: "Niedersachsen" },
+            { code: "NK", city: "Neunkirchen", state: "Saarland" },
+            { code: "NM", city: "Neumarkt", state: "Bayern" },
+            { code: "NMS", city: "Neumünster", state: "Schleswig-Holstein" },
+            { code: "NR", city: "Neuwied", state: "Rheinland-Pfalz" },
+            { code: "NT", city: "Nürtingen", state: "Baden-Württemberg" },
+            { code: "NU", city: "Neu-Ulm", state: "Bayern" },
+            { code: "NW", city: "Neustadt Weinstraße", state: "Rheinland-Pfalz" },
+            { code: "OA", city: "Oberallgäu", state: "Bayern" },
+            { code: "OAL", city: "Ostallgäu", state: "Bayern" },
+            { code: "OB", city: "Oberhausen", state: "Nordrhein-Westfalen" },
+            { code: "OD", city: "Stormarn", state: "Schleswig-Holstein" },
+            { code: "OE", city: "Olpe", state: "Nordrhein-Westfalen" },
+            { code: "OF", city: "Offenbach", state: "Hessen" },
+            { code: "OG", city: "Offenburg", state: "Baden-Württemberg" },
+            { code: "OH", city: "Ostholstein", state: "Schleswig-Holstein" },
+            { code: "OL", city: "Oldenburg", state: "Niedersachsen" },
+            { code: "OS", city: "Osnabrück", state: "Niedersachsen" },
+            { code: "P", city: "Potsdam", state: "Brandenburg" },
+            { code: "PA", city: "Passau", state: "Bayern" },
+            { code: "PAF", city: "Pfaffenhofen", state: "Bayern" },
+            { code: "PB", city: "Paderborn", state: "Nordrhein-Westfalen" },
+            { code: "PE", city: "Peine", state: "Niedersachsen" },
+            { code: "PF", city: "Pforzheim", state: "Baden-Württemberg" },
+            { code: "PI", city: "Pinneberg", state: "Schleswig-Holstein" },
+            { code: "PIR", city: "Pirna", state: "Sachsen" },
+            { code: "PLÖ", city: "Plön", state: "Schleswig-Holstein" },
+            { code: "PS", city: "Pirmasens", state: "Rheinland-Pfalz" },
+            { code: "R", city: "Regensburg", state: "Bayern" },
+            { code: "RA", city: "Rastatt", state: "Baden-Württemberg" },
+            { code: "RD", city: "Rendsburg", state: "Schleswig-Holstein" },
+            { code: "RE", city: "Recklinghausen", state: "Nordrhein-Westfalen" },
+            { code: "REG", city: "Regen", state: "Bayern" },
+            { code: "RH", city: "Roth", state: "Bayern" },
+            { code: "RI", city: "Rinteln", state: "Niedersachsen" },
+            { code: "RO", city: "Rosenheim", state: "Bayern" },
+            { code: "ROW", city: "Rotenburg", state: "Niedersachsen" },
+            { code: "RS", city: "Remscheid", state: "Nordrhein-Westfalen" },
+            { code: "RT", city: "Reutlingen", state: "Baden-Württemberg" },
+            { code: "RV", city: "Ravensburg", state: "Baden-Württemberg" },
+            { code: "RW", city: "Rottweil", state: "Baden-Württemberg" },
+            { code: "S", city: "Stuttgart", state: "Baden-Württemberg" },
+            { code: "SB", city: "Saarbrücken", state: "Saarland" },
+            { code: "SC", city: "Schwabach", state: "Bayern" },
+            { code: "SE", city: "Segeberg", state: "Schleswig-Holstein" },
+            { code: "SG", city: "Solingen", state: "Nordrhein-Westfalen" },
+            { code: "SHA", city: "Schwäbisch Hall", state: "Baden-Württemberg" },
+            { code: "SHL", city: "Suhl", state: "Thüringen" },
+            { code: "SI", city: "Siegen", state: "Nordrhein-Westfalen" },
+            { code: "SIG", city: "Sigmaringen", state: "Baden-Württemberg" },
+            { code: "SL", city: "Schleswig", state: "Schleswig-Holstein" },
+            { code: "SLS", city: "Saarlouis", state: "Saarland" },
+            { code: "SN", city: "Schwerin", state: "Mecklenburg-Vorpommern" },
+            { code: "SO", city: "Soest", state: "Nordrhein-Westfalen" },
+            { code: "SOG", city: "Schongau", state: "Bayern" },
+            { code: "SON", city: "Sonneberg", state: "Thüringen" },
+            { code: "SP", city: "Speyer", state: "Rheinland-Pfalz" },
+            { code: "SR", city: "Straubing", state: "Bayern" },
+            { code: "ST", city: "Steinfurt", state: "Nordrhein-Westfalen" },
+            { code: "STA", city: "Starnberg", state: "Bayern" },
+            { code: "STD", city: "Stade", state: "Niedersachsen" },
+            { code: "SU", city: "Siegburg", state: "Nordrhein-Westfalen" },
+            { code: "SUL", city: "Sulzbach", state: "Bayern" },
+            { code: "SÜW", city: "Südliche Weinstraße", state: "Rheinland-Pfalz" },
+            { code: "SW", city: "Schweinfurt", state: "Bayern" },
+            { code: "SZ", city: "Salzgitter", state: "Niedersachsen" },
+            { code: "TBB", city: "Tauberbischofsheim", state: "Baden-Württemberg" },
+            { code: "TIR", city: "Tirschenreuth", state: "Bayern" },
+            { code: "TÖL", city: "Bad Tölz", state: "Bayern" },
+            { code: "TR", city: "Trier", state: "Rheinland-Pfalz" },
+            { code: "TS", city: "Traunstein", state: "Bayern" },
+            { code: "TT", city: "Tettnang", state: "Baden-Württemberg" },
+            { code: "TÜ", city: "Tübingen", state: "Baden-Württemberg" },
+            { code: "TUT", city: "Tuttlingen", state: "Baden-Württemberg" },
+            { code: "UE", city: "Uelzen", state: "Niedersachsen" },
+            { code: "UL", city: "Ulm", state: "Baden-Württemberg" },
+            { code: "UN", city: "Unna", state: "Nordrhein-Westfalen" },
+            { code: "V", city: "Vogtland", state: "Sachsen" },
+            { code: "VEC", city: "Vechta", state: "Niedersachsen" },
+            { code: "VER", city: "Verden", state: "Niedersachsen" },
+            { code: "VIE", city: "Viersen", state: "Nordrhein-Westfalen" },
+            { code: "VK", city: "Völklingen", state: "Saarland" },
+            { code: "VS", city: "Villingen-Schwenningen", state: "Baden-Württemberg" },
+            { code: "W", city: "Wuppertal", state: "Nordrhein-Westfalen" },
+            { code: "WAF", city: "Warendorf", state: "Nordrhein-Westfalen" },
+            { code: "WB", city: "Wittenberg", state: "Sachsen-Anhalt" },
+            { code: "WEN", city: "Weiden", state: "Bayern" },
+            { code: "WES", city: "Wesel", state: "Nordrhein-Westfalen" },
+            { code: "WF", city: "Wolfenbüttel", state: "Niedersachsen" },
+            { code: "WHV", city: "Wilhelmshaven", state: "Niedersachsen" },
+            { code: "WI", city: "Wiesbaden", state: "Hessen" },
+            { code: "WIL", city: "Wittlich", state: "Rheinland-Pfalz" },
+            { code: "WM", city: "Weilheim", state: "Bayern" },
+            { code: "WN", city: "Waiblingen", state: "Baden-Württemberg" },
+            { code: "WND", city: "St. Wendel", state: "Saarland" },
+            { code: "WO", city: "Worms", state: "Rheinland-Pfalz" },
+            { code: "WOB", city: "Wolfsburg", state: "Niedersachsen" },
+            { code: "WS", city: "Wasserburg", state: "Bayern" },
+            { code: "WT", city: "Waldshut", state: "Baden-Württemberg" },
+            { code: "WTM", city: "Wittmund", state: "Niedersachsen" },
+            { code: "WÜ", city: "Würzburg", state: "Bayern" },
+            { code: "WUG", city: "Weißenburg", state: "Bayern" },
+            { code: "WUN", city: "Wunsiedel", state: "Bayern" },
+            { code: "Z", city: "Zwickau", state: "Sachsen" },
+            { code: "ZW", city: "Zweibrücken", state: "Rheinland-Pfalz" }
+        ];
+
+        // Initialisierung
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sprachsynthese vorbereiten
+            prepareSpeech();
+            initializeSpeechRecognition();
+            setupEventListeners();
+            updateSpeechSlider();
+        });
+
+        function prepareSpeech() {
+            if (!speechSynthesis) return;
+            
+            speechSynthesis.getVoices();
+            
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = function() {
+                    isSpeechReady = true;
+                };
+            }
+            if (speechSynthesis.getVoices().length > 0) {
+                isSpeechReady = true;
+            }
+            setTimeout(() => { isSpeechReady = true; }, 100);
+        }
+        
+
+        function initializeSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.lang = 'de-DE';
+                recognition.interimResults = false;
+
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('answerInput').value = transcript;
+                    stopListening();
+                };
+
+                recognition.onerror = function(event) {
+                    if (event.error === 'network') {
+                        // Spracherkennung braucht Internet - Button ausblenden
+                        console.log('Spracherkennung offline nicht verfügbar.');
+                        const voiceBtn = document.getElementById('voiceBtn');
+                        if (voiceBtn) {
+                            voiceBtn.style.display = 'none';
+                        }
+                    } else if (event.error === 'not-allowed') {
+                        console.log('Mikrofon-Zugriff verweigert.');
+                    }
+                    stopListening();
+                };
+
+                recognition.onend = function() {
+                    stopListening();
+                };
+            } else {
+                document.getElementById('voiceBtn').style.display = 'none';
+            }
+        }
+
+        function setupEventListeners() {
+            // Spielmodus-Auswahl über Dropdown
+            document.getElementById('gameMode').addEventListener('change', function() {
+                const mode = this.value;
+                if (mode) {
+                    selectMode(mode);
+                }
+            });
+
+            // Buttons
+            document.getElementById('checkBtn').addEventListener('click', checkAnswer);
+            document.getElementById('hintBtn').addEventListener('click', showHint);
+            document.getElementById('solutionBtn').addEventListener('click', showSolution);
+            document.getElementById('skipBtn').addEventListener('click', generateQuestion);
+            document.getElementById('newBtn').addEventListener('click', generateQuestion);
+            document.getElementById('voiceBtn').addEventListener('click', toggleVoice);
+            document.getElementById('backBtn').addEventListener('click', goBack);
+            document.getElementById('testSpeechBtn').addEventListener('click', function() {
+                speak('Hallo! So klingt die Stimme jetzt. Stelle die Regler ein, bis es gut klingt!');
+            });
+            
+            // Enter-Taste
+            document.getElementById('answerInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkAnswer();
+                }
+            });
+
+            // Einstellungs-Regler
+            document.getElementById('speechSetting').addEventListener('change', updateSpeechSlider);
+            document.getElementById('speechSlider').addEventListener('input', updateCurrentSetting);
+        }
+
+        function updateSpeechSlider() {
+            const setting = document.getElementById('speechSetting').value;
+            const slider = document.getElementById('speechSlider');
+            const label = document.getElementById('currentSettingLabel');
+            const valueDisplay = document.getElementById('currentValue');
+            
+            // Setze Min/Max und aktuellen Wert basierend auf Einstellung
+            if (setting === 'volume') {
+                label.textContent = 'Lautstärke:';
+                slider.min = 0;
+                slider.max = 100;
+                slider.value = speechSettings.volume;
+                valueDisplay.textContent = speechSettings.volume + '%';
+            } else if (setting === 'rate') {
+                label.textContent = 'Geschwindigkeit:';
+                slider.min = 50;
+                slider.max = 150;
+                slider.value = speechSettings.rate;
+                const rateText = speechSettings.rate < 80 ? 'Langsam' : speechSettings.rate < 100 ? 'Etwas langsam' : speechSettings.rate < 120 ? 'Normal' : speechSettings.rate < 140 ? 'Schnell' : 'Sehr schnell';
+                valueDisplay.textContent = rateText;
+            } else if (setting === 'pitch') {
+                label.textContent = 'Tonhöhe:';
+                slider.min = 50;
+                slider.max = 150;
+                slider.value = speechSettings.pitch;
+                const pitchText = speechSettings.pitch < 80 ? 'Tief' : speechSettings.pitch < 100 ? 'Etwas tief' : speechSettings.pitch < 120 ? 'Normal' : speechSettings.pitch < 140 ? 'Hoch' : 'Sehr hoch';
+                valueDisplay.textContent = pitchText;
+            }
+        }
+        
+        function updateCurrentSetting() {
+            const setting = document.getElementById('speechSetting').value;
+            const value = parseInt(document.getElementById('speechSlider').value);
+            const valueDisplay = document.getElementById('currentValue');
+            
+            // Speichere den Wert
+            speechSettings[setting] = value;
+            
+            // Aktualisiere Anzeige
+            if (setting === 'volume') {
+                valueDisplay.textContent = value + '%';
+            } else if (setting === 'rate') {
+                const rateText = value < 80 ? 'Langsam' : value < 100 ? 'Etwas langsam' : value < 120 ? 'Normal' : value < 140 ? 'Schnell' : 'Sehr schnell';
+                valueDisplay.textContent = rateText;
+            } else if (setting === 'pitch') {
+                const pitchText = value < 80 ? 'Tief' : value < 100 ? 'Etwas tief' : value < 120 ? 'Normal' : value < 140 ? 'Hoch' : 'Sehr hoch';
+                valueDisplay.textContent = pitchText;
+            }
+        }
+
+        function selectMode(mode) {
+            currentMode = mode;
+            
+            // Blende Einstellungen aus und zeige Zurück-Button
+            document.getElementById('settingsPanel').style.display = 'none';
+            document.getElementById('backBtn').style.display = 'block';
+            document.getElementById('gameArea').classList.add('active');
+            
+            generateQuestion();
+        }
+        
+        function goBack() {
+            // Zeige Einstellungen wieder und verstecke Spiel
+            document.getElementById('settingsPanel').style.display = 'block';
+            document.getElementById('backBtn').style.display = 'none';
+            document.getElementById('gameArea').classList.remove('active');
+            
+            // Reset Spielmodus-Auswahl
+            document.getElementById('gameMode').value = '';
+            currentMode = null;
+        }
+        
+        function showHint() {
+            const feedback = document.getElementById('feedback');
+            feedback.className = 'feedback';
+            feedback.style.display = 'block';
+            feedback.style.background = '#667eea';
+            
+            if (!currentQuestion) return;
+            
+            let hint = '';
+            
+            if (currentQuestion.type === 'einmaleins') {
+                // Tipp: Zeige die Aufgabe nochmal anders formuliert
+                const parts = currentQuestion.text.split('×');
+                const a = parseInt(parts[0].trim());
+                const b = parseInt(parts[1].trim());
+                hint = `💡 Tipp: ${a} mal ${b} bedeutet: ${a} + ${a} + ... (${b} mal)`;
+            } else if (currentQuestion.type === 'prozent') {
+                hint = `💡 Tipp: Prozent bedeutet "von hundert". ${currentQuestion.text} rechnen!`;
+            } else if (currentQuestion.type === 'kette') {
+                hint = `💡 Tipp: Rechne Schritt für Schritt: ${currentQuestion.text}`;
+            } else if (currentQuestion.type === 'zahlenraten') {
+                const quarter = Math.floor(currentQuestion.max / 4);
+                hint = `💡 Tipp: Probier mal die Mitte - vielleicht ${quarter * 2}?`;
+            } else if (currentQuestion.type === 'raetsel') {
+                hint = `💡 Tipp: Denk mal um die Ecke... manchmal ist es ein Wortspiel!`;
+            } else if (currentQuestion.type === 'quiz') {
+                hint = `💡 Tipp: Überleg dir wo das in Deutschland liegen könnte...`;
+            } else if (currentQuestion.type === 'wortpuzzle') {
+                // Zeige den ersten Buchstaben als Tipp
+                const firstLetter = currentQuestion.originalWord[0];
+                hint = `💡 Tipp: Das Wort beginnt mit "${firstLetter}"`;
+            } else {
+                hint = `💡 Tipp: Lies die Aufgabe nochmal genau durch!`;
+            }
+            
+            feedback.textContent = hint;
+            speak('Hier ist ein Tipp für dich');
+        }
+        
+        function showSolution() {
+            const feedback = document.getElementById('feedback');
+            feedback.className = 'feedback';
+            feedback.style.display = 'block';
+            feedback.style.background = '#f5576c';
+            feedback.style.color = 'white';
+            
+            if (!currentQuestion) return;
+            
+            let solution = '';
+            
+            if (currentQuestion.type === 'raetsel') {
+                solution = `👁️ Lösung: ${currentQuestion.answer}. ${currentQuestion.riddle.explanation}`;
+            } else if (currentQuestion.type === 'geschichten') {
+                solution = `👁️ Erzähl einfach eine Geschichte mit den Wörtern! Es gibt keine falsche Antwort 😊`;
+            } else if (currentQuestion.type === 'kennzeichenfinder') {
+                solution = `👁️ Gib ein beliebiges Kennzeichen ein und ich sage dir wo es herkommt!`;
+            } else if (currentQuestion.type === 'wortpuzzle') {
+                solution = `👁️ Lösung: ${currentQuestion.originalWord}`;
+            } else if (currentQuestion.type === 'einmaleins' && currentQuestion.showSteps) {
+                // Zeige detaillierten Rechenweg für große Multiplikationen
+                const a = currentQuestion.factorA;
+                const b = currentQuestion.factorB;
+                
+                // Zerlege b in Ziffern (von rechts nach links)
+                const digitsB = String(b).split('').reverse().map(d => parseInt(d));
+                
+                let steps = [];
+                let sum = 0;
+                
+                digitsB.forEach((digit, index) => {
+                    const partial = a * digit;
+                    const withZeros = partial * Math.pow(10, index);
+                    steps.push({
+                        digit: digit,
+                        position: index,
+                        calculation: `${a} × ${digit}`,
+                        partial: partial,
+                        withZeros: withZeros
+                    });
+                    sum += withZeros;
+                });
+                
+                // Erstelle schriftliche Darstellung
+                let explanation = `<div style="font-family: monospace; text-align: left; background: white; color: #333; padding: 15px; border-radius: 8px; margin-top: 10px;">`;
+                explanation += `<strong>Rechenweg:</strong><br><br>`;
+                explanation += `<div style="display: inline-block; text-align: right;">`;
+                explanation += `<div style="border-bottom: 2px solid #333; padding-bottom: 5px;">`;
+                explanation += `  ${String(a).padStart(6, ' ')}<br>`;
+                explanation += `× ${String(b).padStart(4, ' ')}<br>`;
+                explanation += `</div>`;
+                
+                steps.forEach((step, idx) => {
+                    const zerosNeeded = step.position;
+                    const paddedPartial = String(step.partial) + '0'.repeat(zerosNeeded);
+                    explanation += `<div>${paddedPartial.padStart(7, ' ')}</div>`;
+                });
+                
+                explanation += `<div style="border-top: 2px solid #333; margin-top: 5px; padding-top: 5px;">`;
+                explanation += `${String(sum).padStart(7, ' ')}`;
+                explanation += `</div>`;
+                explanation += `</div>`;
+                explanation += `<br><br><strong>Ergebnis: ${sum}</strong>`;
+                explanation += `</div>`;
+                
+                feedback.innerHTML = explanation;
+                speak(`Die Lösung ist ${currentQuestion.answer}`);
+                
+                // Punkte abziehen für Lösung
+                if (streak > 0) streak = Math.max(0, streak - 1);
+                updateScoreBoard();
+                return;
+            } else {
+                solution = `👁️ Lösung: ${currentQuestion.answer}`;
+            }
+            
+            feedback.textContent = solution;
+            speak(`Die Lösung ist ${currentQuestion.answer}`);
+            
+            // Punkte abziehen für Lösung
+            if (streak > 0) streak = Math.max(0, streak - 1);
+            updateScoreBoard();
+        }
+
+        function generateQuestion() {
+            const feedback = document.getElementById('feedback');
+            feedback.className = 'feedback';
+            feedback.style.display = 'none';
+            feedback.innerHTML = '';
+            feedback.textContent = '';
+            feedback.style.background = '';
+            feedback.style.color = '';
+            
+            document.getElementById('answerInput').value = '';
+            document.getElementById('answerInput').focus();
+
+            const difficulty = document.getElementById('difficulty').value;
+
+            switch(currentMode) {
+                case 'kennzeichenfinder':
+                    generateKennzeichenFinder(difficulty);
+                    break;
+                case 'wortpuzzle':
+                    generateWortPuzzle(difficulty);
+                    break;
+                case 'einmaleins':
+                    generateEinmaleins(difficulty);
+                    break;
+                case 'prozent':
+                    generateProzent(difficulty);
+                    break;
+                case 'zahlenraten':
+                    generateZahlenraten(difficulty);
+                    break;
+                case 'kette':
+                    generateKette(difficulty);
+                    break;
+                case 'raetsel':
+                    generateRaetsel();
+                    break;
+                case 'kennzeichen':
+                    generateKennzeichen(difficulty);
+                    break;
+                case 'stadtlandfluss':
+                    generateStadtLandFluss(difficulty);
+                    break;
+                case 'geschichten':
+                    generateGeschichten(difficulty);
+                    break;
+                case 'quiz':
+                    generateQuiz(difficulty);
+                    break;
+            }
+
+            // Warte kurz bevor gesprochen wird, damit die Frage sichtbar ist
+            setTimeout(() => {
+                speak(document.getElementById('question').textContent);
+            }, 200);
+        }
+
+        function generateKennzeichenFinder(difficulty) {
+            // Kein spezielles Setup nötig - warte auf Eingabe
+            currentQuestion = {
+                type: 'kennzeichenfinder',
+                answer: null  // Wird beim Prüfen gesetzt
+            };
+
+            const phrases = [
+                'Zu welchem Kennzeichen suchst du den Ort?',
+                'Gib ein Kennzeichen ein:',
+                'Welches Kennzeichen willst du nachschlagen?',
+                'Kennzeichen eingeben:'
+            ];
+
+            document.getElementById('question').textContent = phrases[Math.floor(Math.random() * phrases.length)];
+            
+            let contentHtml = `
+                <div style="text-align: center; margin: 20px 0;">
+                    <div style="
+                        font-size: 1.3em;
+                        color: #667eea;
+                        padding: 20px;
+                        background: #f8f9fa;
+                        border-radius: 15px;
+                        line-height: 1.8;
+                    ">
+                        🚗 Gib ein Kennzeichen ein!<br><br>
+                        Nur die <strong>Buchstaben</strong><br>
+                        (z.B. "KUS", "M", "FL")
+                    </div>
+                    <div style="font-size: 0.9em; color: #999; margin-top: 20px;">
+                        💡 Perfekt für unterwegs: Siehst du ein Kennzeichen? Schlag es nach!
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('gameContent').innerHTML = contentHtml;
+        }
+
+        function generateWortPuzzle(difficulty) {
+            // Sammle Wörter aus der Stadt-Land-Fluss Datenbank
+            let allWords = [];
+            
+            // Sammle alle Wörter aus verschiedenen Kategorien
+            for (const letter in stadtLandFlussData.antworten) {
+                const letterData = stadtLandFlussData.antworten[letter];
+                
+                // Städte (immer interessant)
+                if (letterData.Stadt) {
+                    allWords.push(...letterData.Stadt);
+                }
+                
+                // Tiere (besonders für Kinder)
+                if (letterData.Tier) {
+                    allWords.push(...letterData.Tier);
+                }
+                
+                // Pflanzen
+                if (letterData.Pflanze) {
+                    allWords.push(...letterData.Pflanze);
+                }
+                
+                // Namen
+                if (letterData.Name) {
+                    allWords.push(...letterData.Name);
+                }
+                
+                // Berufe
+                if (letterData.Beruf) {
+                    allWords.push(...letterData.Beruf);
+                }
+            }
+            
+            // Filtere nach Schwierigkeit (Wortlänge)
+            let filteredWords;
+            if (difficulty === 'easy') {
+                // Kurze Wörter (3-6 Buchstaben)
+                filteredWords = allWords.filter(w => w.length >= 3 && w.length <= 6);
+            } else if (difficulty === 'medium') {
+                // Mittellange Wörter (5-9 Buchstaben)
+                filteredWords = allWords.filter(w => w.length >= 5 && w.length <= 9);
+            } else {
+                // Lange Wörter (8+ Buchstaben)
+                filteredWords = allWords.filter(w => w.length >= 8);
+            }
+            
+            // Falls keine passenden Wörter gefunden, nimm alle
+            if (filteredWords.length === 0) {
+                filteredWords = allWords;
+            }
+            
+            // Wähle zufälliges Wort
+            const correctWord = filteredWords[Math.floor(Math.random() * filteredWords.length)].toUpperCase();
+            
+            // Mische die Buchstaben durcheinander
+            let scrambled;
+            let attempts = 0;
+            do {
+                scrambled = correctWord.split('').sort(() => Math.random() - 0.5).join('');
+                attempts++;
+            } while (scrambled === correctWord && correctWord.length > 3 && attempts < 20);
+            
+            currentQuestion = {
+                type: 'wortpuzzle',
+                answer: correctWord.toLowerCase(),
+                scrambled: scrambled,
+                originalWord: correctWord
+            };
+
+            const phrases = [
+                'Bringe die Buchstaben in die richtige Reihenfolge:',
+                'Welches Wort ist das?',
+                'Sortiere die Buchstaben richtig:',
+                'Finde das richtige Wort:'
+            ];
+
+            document.getElementById('question').textContent = phrases[Math.floor(Math.random() * phrases.length)];
+            
+            let contentHtml = `
+                <div style="text-align: center; margin: 30px 0;">
+                    <div style="
+                        font-size: 3em;
+                        font-weight: bold;
+                        color: #667eea;
+                        letter-spacing: 10px;
+                        padding: 30px;
+                        background: #f8f9fa;
+                        border-radius: 15px;
+                        display: inline-block;
+                        margin: 20px;
+                    ">${scrambled}</div>
+                    <div style="font-size: 1.1em; color: #666; margin-top: 20px;">
+                        💡 <strong>Tipp:</strong> Das Wort hat ${correctWord.length} Buchstaben
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('gameContent').innerHTML = contentHtml;
+        }
+
+        function generateEinmaleins(difficulty) {
+            let a, b;
+            
+            if (difficulty === 'easy') {
+                // Leicht: Kleines 1×1 (2-9 × 2-9)
+                // Gewichtung: 1,2,10 selten, 3-9 häufig
+                const weights = [3,3,4,4,5,5,6,6,7,7,8,8,9,9]; // Viele 3-9
+                a = weights[Math.floor(Math.random() * weights.length)];
+                b = weights[Math.floor(Math.random() * weights.length)];
+                
+                currentQuestion = {
+                    type: 'einmaleins',
+                    text: `${a} × ${b}`,
+                    answer: a * b,
+                    startTime: Date.now(),
+                    showSteps: false
+                };
+                
+                const phrases = [
+                    `Was ist ${a} mal ${b}?`,
+                    `Schnell: ${a} × ${b}?`,
+                    `${a} mal ${b}?`
+                ];
+                
+                document.getElementById('question').textContent = phrases[Math.floor(Math.random() * phrases.length)];
+                
+                let contentHtml = `
+                    <div style="text-align: center; margin: 20px 0;">
+                        <div style="font-size: 0.9em; color: #666; margin-bottom: 10px;">
+                            ⏱️ Kleines 1×1 - Schnell wie aus der Pistole!
+                        </div>
+                        <div style="
+                            width: 100%;
+                            height: 8px;
+                            background: #e0e0e0;
+                            border-radius: 10px;
+                            overflow: hidden;
+                        ">
+                            <div id="timerBar" style="
+                                width: 100%;
+                                height: 100%;
+                                background: linear-gradient(90deg, #4CAF50 0%, #FFC107 50%, #f44336 100%);
+                                transition: width 5s linear;
+                            "></div>
+                        </div>
+                        <div style="font-size: 0.8em; color: #999; margin-top: 5px;">
+                            Unter 3 Sekunden = Bonus! 🌟
+                        </div>
+                    </div>
+                `;
+                document.getElementById('gameContent').innerHTML = contentHtml;
+                setTimeout(() => {
+                    const bar = document.getElementById('timerBar');
+                    if (bar) bar.style.width = '0%';
+                }, 100);
+                
+            } else if (difficulty === 'medium') {
+                // Mittel: 1-stellig × 2-stellig
+                // Gewichtung für 1-stellig: 3-9 häufig, 1,2,10 selten
+                const weights1 = [3,3,4,4,5,5,6,6,7,7,8,8,9,9,2,10]; // Wenig 2 und 10
+                a = weights1[Math.floor(Math.random() * weights1.length)];
+                
+                // 2-stellige Zahl: 11-99, aber 10,20,30... seltener
+                const tens = Math.floor(Math.random() * 9) + 1; // 1-9
+                const ones = Math.random() < 0.3 ? 0 : Math.floor(Math.random() * 9) + 1; // 0 seltener
+                b = tens * 10 + ones;
+                
+                currentQuestion = {
+                    type: 'einmaleins',
+                    text: `${a} × ${b}`,
+                    answer: a * b,
+                    startTime: Date.now(),
+                    showSteps: true,
+                    factorA: a,
+                    factorB: b
+                };
+                
+                document.getElementById('question').textContent = `Rechne: ${a} × ${b}`;
+                
+                let contentHtml = `
+                    <div style="text-align: center; margin: 20px 0;">
+                        <div style="font-size: 1.1em; color: #666; margin-bottom: 15px;">
+                            📝 Du kannst schriftlich rechnen!
+                        </div>
+                        <div style="
+                            font-family: monospace;
+                            font-size: 1.5em;
+                            background: #f8f9fa;
+                            padding: 20px;
+                            border-radius: 10px;
+                            display: inline-block;
+                            text-align: right;
+                        ">
+                            <div style="border-bottom: 2px solid #333; padding-bottom: 5px;">
+                                ${String(b).padStart(4, ' ')}<br>
+                                × ${String(a).padStart(2, ' ')}
+                            </div>
+                            <div style="padding-top: 5px;">_____</div>
+                        </div>
+                        <div style="font-size: 0.9em; color: #999; margin-top: 15px;">
+                            💡 Tipp: Ziffer für Ziffer multiplizieren, dann addieren
+                        </div>
+                    </div>
+                `;
+                document.getElementById('gameContent').innerHTML = contentHtml;
+                
+            } else {
+                // Schwer: 2-stellig × 2-stellig
+                // Beide Zahlen 11-99, aber runde Zahlen seltener
+                const tens1 = Math.floor(Math.random() * 9) + 1;
+                const ones1 = Math.random() < 0.3 ? 0 : Math.floor(Math.random() * 9) + 1;
+                a = tens1 * 10 + ones1;
+                
+                const tens2 = Math.floor(Math.random() * 9) + 1;
+                const ones2 = Math.random() < 0.3 ? 0 : Math.floor(Math.random() * 9) + 1;
+                b = tens2 * 10 + ones2;
+                
+                currentQuestion = {
+                    type: 'einmaleins',
+                    text: `${a} × ${b}`,
+                    answer: a * b,
+                    startTime: Date.now(),
+                    showSteps: true,
+                    factorA: a,
+                    factorB: b
+                };
+                
+                document.getElementById('question').textContent = `Rechne: ${a} × ${b}`;
+                
+                let contentHtml = `
+                    <div style="text-align: center; margin: 20px 0;">
+                        <div style="font-size: 1.1em; color: #666; margin-bottom: 15px;">
+                            📝 Schriftlich multiplizieren!
+                        </div>
+                        <div style="
+                            font-family: monospace;
+                            font-size: 1.5em;
+                            background: #f8f9fa;
+                            padding: 20px;
+                            border-radius: 10px;
+                            display: inline-block;
+                            text-align: right;
+                        ">
+                            <div style="border-bottom: 2px solid #333; padding-bottom: 5px;">
+                                ${String(a).padStart(4, ' ')}<br>
+                                × ${String(b).padStart(2, ' ')}
+                            </div>
+                            <div style="padding-top: 5px;">_____</div>
+                        </div>
+                        <div style="font-size: 0.9em; color: #999; margin-top: 15px;">
+                            💡 Jede Ziffer einzeln multiplizieren, dann zusammenzählen
+                        </div>
+                    </div>
+                `;
+                document.getElementById('gameContent').innerHTML = contentHtml;
+            }
+        }
+
+        function generateProzent(difficulty) {
+            if (difficulty === 'easy') {
+                // Einfache Prozent-Aufgaben
+                const base = Math.floor(Math.random() * 5) * 20 + 20; // 20, 40, 60, 80, 100
+                const percent = [10, 20, 25, 50][Math.floor(Math.random() * 4)];
+                currentQuestion = {
+                    type: 'prozent',
+                    text: `${percent}% von ${base}`,
+                    answer: (base * percent / 100)
+                };
+                
+                const phrases = [
+                    `Was sind ${percent}% von ${base}?`,
+                    `Rechne ${percent} Prozent von ${base}`,
+                    `${percent} Prozent von ${base} sind?`
+                ];
+                
+                document.getElementById('question').textContent = phrases[Math.floor(Math.random() * phrases.length)];
+            } else if (difficulty === 'medium') {
+                // Steigungen als Rechenaufgabe
+                const steigung = Math.floor(Math.random() * 12) + 3; // 3-14%
+                const strecke = [100, 200, 50][Math.floor(Math.random() * 3)];
+                const antwort = Math.round(strecke * steigung / 100);
+                
+                currentQuestion = {
+                    type: 'prozent',
+                    text: `${steigung}% Steigung auf ${strecke}m`,
+                    answer: antwort
+                };
+                
+                const phrases = [
+                    `Bei ${steigung}% Steigung: Wie viele Meter steigt die Straße auf ${strecke}m?`,
+                    `${steigung}% Steigung - wie viele Meter Höhenunterschied auf ${strecke}m Strecke?`,
+                    `Straße steigt ${steigung}% auf ${strecke}m. Höhenunterschied in Meter?`
+                ];
+                
+                document.getElementById('question').textContent = phrases[Math.floor(Math.random() * phrases.length)];
+            } else {
+                // Schwierige Prozent-Aufgaben
+                const choices = Math.random();
+                if (choices < 0.5) {
+                    // Prozent von einer Zahl
+                    const base = Math.floor(Math.random() * 200) + 50;
+                    const percent = Math.floor(Math.random() * 30) + 10;
+                    currentQuestion = {
+                        type: 'prozent',
+                        text: `${percent}% von ${base}`,
+                        answer: Math.round(base * percent / 100)
+                    };
+                    document.getElementById('question').textContent = `Was sind ${percent}% von ${base}?`;
+                } else {
+                    // Rabatt-Rechnung
+                    const preis = Math.floor(Math.random() * 100) * 10 + 100; // 100-1000, durch 10 teilbar
+                    const rabatt = [10, 15, 20, 25, 30][Math.floor(Math.random() * 5)];
+                    const rabattBetrag = preis * rabatt / 100;
+                    currentQuestion = {
+                        type: 'prozent',
+                        text: `${preis}€ minus ${rabatt}%`,
+                        answer: Math.round(preis - rabattBetrag)
+                    };
+                    document.getElementById('question').textContent = `Ein Artikel kostet ${preis}€. ${rabatt}% Rabatt. Neuer Preis?`;
+                }
+            }
+            document.getElementById('gameContent').innerHTML = '';
+        }
+
+        function generateZahlenraten(difficulty) {
+            const max = difficulty === 'easy' ? 100 : difficulty === 'medium' ? 500 : 1000;
+            const target = Math.floor(Math.random() * max) + 1;
+            
+            currentQuestion = {
+                type: 'zahlenraten',
+                target: target,
+                max: max,
+                attempts: 0
+            };
+
+            const phrases = [
+                `Ich hab mir eine Zahl zwischen 1 und ${max} ausgedacht. Welche ist es?`,
+                `Rate mal: Ich denke an eine Zahl zwischen 1 und ${max}`,
+                `Zwischen 1 und ${max} - welche Zahl meine ich?`
+            ];
+
+            document.getElementById('question').textContent = phrases[Math.floor(Math.random() * phrases.length)];
+            document.getElementById('gameContent').innerHTML = '<div class="number-guess-info">Ich sag dir, wie nah du dran bist!</div>';
+        }
+
+        function generateKette(difficulty) {
+            let steps = difficulty === 'easy' ? 3 : difficulty === 'medium' ? 4 : 5;
+            let start = Math.floor(Math.random() * 20) + 10;
+            let operations = [];
+            let current = start;
+
+            const ops = difficulty === 'easy' ? ['+', '-'] : ['+', '-', '×', '÷'];
+
+            for (let i = 0; i < steps; i++) {
+                const op = ops[Math.floor(Math.random() * ops.length)];
+                let num;
+                
+                switch(op) {
+                    case '+':
+                        num = Math.floor(Math.random() * 20) + 1;
+                        current += num;
+                        break;
+                    case '-':
+                        num = Math.floor(Math.random() * Math.min(current - 1, 20)) + 1;
+                        current -= num;
+                        break;
+                    case '×':
+                        num = Math.floor(Math.random() * 5) + 2;
+                        current *= num;
+                        break;
+                    case '÷':
+                        const divisors = [2, 3, 4, 5].filter(d => current % d === 0);
+                        num = divisors.length > 0 ? divisors[Math.floor(Math.random() * divisors.length)] : 2;
+                        current = Math.floor(current / num);
+                        break;
+                }
+                operations.push({ op, num });
+            }
+
+            currentQuestion = {
+                type: 'kette',
+                start: start,
+                operations: operations,
+                answer: current
+            };
+
+            let chainHtml = `<div class="chain-calc"><span class="chain-step chain-current">${start}</span>`;
+            operations.forEach(step => {
+                chainHtml += `<span class="chain-step">${step.op} ${step.num}</span>`;
+            });
+            chainHtml += '</div>';
+
+            const phrases = [
+                'Rechne das mal aus:',
+                'Was kommt hier raus?',
+                'Kannst du das lösen?',
+                'Schritt für Schritt rechnen:'
+            ];
+
+            document.getElementById('question').textContent = phrases[Math.floor(Math.random() * phrases.length)];
+            document.getElementById('gameContent').innerHTML = chainHtml;
+        }
+
+        function generateRaetsel() {
+            const riddle = riddles[Math.floor(Math.random() * riddles.length)];
+            
+            currentQuestion = {
+                type: 'raetsel',
+                riddle: riddle,
+                answer: riddle.answer.toLowerCase()
+            };
+
+            const phrases = [
+                'Hör mal zu, ein Rätsel:',
+                'Pass auf, das ist knifflig:',
+                'Kannst du das lösen?',
+                'Mal überlegen:'
+            ];
+
+            document.getElementById('question').textContent = phrases[Math.floor(Math.random() * phrases.length)];
+            document.getElementById('gameContent').innerHTML = `<div class="riddle-text">${riddle.question}</div>`;
+        }
+
+        function generateKennzeichen(difficulty) {
+            const plate = licensePlates[Math.floor(Math.random() * licensePlates.length)];
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const randomLetters = letters[Math.floor(Math.random() * letters.length)] + 
+                                 letters[Math.floor(Math.random() * letters.length)];
+            const numbers = Math.floor(Math.random() * 9000) + 1000;
+            
+            const fullPlate = `${plate.code}-${randomLetters} ${numbers}`;
+            
+            // Verschiedene Aufgabentypen
+            const tasks = [
+                {
+                    question: `Zähl alle Ziffern zusammen: ${numbers}`,
+                    spokenQuestion: `Zähl alle Ziffern von ${String(numbers).split('').join(', ')} zusammen`,
+                    answer: String(numbers).split('').reduce((sum, digit) => sum + parseInt(digit), 0)
+                },
+                {
+                    question: `Die ersten zwei Ziffern mal nehmen: ${numbers}`,
+                    spokenQuestion: `Nimm die ersten zwei Ziffern mal`,
+                    answer: parseInt(String(numbers)[0]) * parseInt(String(numbers)[1])
+                },
+                {
+                    question: `Woher kommt das Auto?`,
+                    spokenQuestion: `Aus welcher Stadt kommt das Auto?`,
+                    answer: plate.city.toLowerCase()
+                }
+            ];
+
+            const task = tasks[Math.floor(Math.random() * tasks.length)];
+
+            currentQuestion = {
+                type: 'kennzeichen',
+                plate: plate,
+                answer: task.answer,
+                taskType: task.question,
+                spokenQuestion: task.spokenQuestion
+            };
+
+            document.getElementById('question').textContent = task.question;
+            document.getElementById('gameContent').innerHTML = `<div class="license-plate">${fullPlate}</div>`;
+        }
+
+        function generateStadtLandFluss(difficulty) {
+            // Wähle zufälligen Buchstaben
+            const alphabet = 'ABCDEFGHIJKLMNOPRSTUVWZ'; // Ohne Q, X, Y
+            const letter = alphabet[Math.floor(Math.random() * alphabet.length)];
+            
+            // Wähle Kategorien basierend auf Schwierigkeit
+            let categories;
+            if (difficulty === 'easy') {
+                categories = ['Stadt', 'Tier', 'Name'];
+            } else if (difficulty === 'medium') {
+                categories = ['Stadt', 'Land', 'Tier', 'Name'];
+            } else {
+                // Zufällige 4-5 Kategorien
+                const allCats = stadtLandFlussData.kategorien;
+                const numCats = 4 + Math.floor(Math.random() * 2); // 4 oder 5
+                categories = [];
+                const shuffled = [...allCats].sort(() => 0.5 - Math.random());
+                categories = shuffled.slice(0, numCats);
+            }
+            
+            // Wähle eine zufällige Kategorie als Frage
+            const askCategory = categories[Math.floor(Math.random() * categories.length)];
+            
+            // Hole mögliche Antworten
+            const letterData = stadtLandFlussData.antworten[letter];
+            const possibleAnswers = (letterData && letterData[askCategory]) ? letterData[askCategory] : [];
+            
+            // Falls keine Antworten vorhanden, nimm einen anderen Buchstaben
+            if (possibleAnswers.length === 0) {
+                generateStadtLandFluss(difficulty); // Rekursiv neuen Buchstaben probieren
+                return;
+            }
+            
+            currentQuestion = {
+                type: 'stadtlandfluss',
+                letter: letter,
+                category: askCategory,
+                categories: categories,
+                possibleAnswers: possibleAnswers.map(a => a.toLowerCase())
+            };
+
+            const phrases = [
+                `Nenn mir ${askCategory === 'Stadt' ? 'eine Stadt' : askCategory === 'Land' ? 'ein Land' : askCategory === 'Fluss' ? 'einen Fluss' : askCategory === 'Tier' ? 'ein Tier' : askCategory === 'Pflanze' ? 'eine Pflanze' : askCategory === 'Beruf' ? 'einen Beruf' : 'einen Namen'} mit ${letter}`,
+                `${askCategory} mit ${letter}?`,
+                `Fällt dir ${askCategory === 'Stadt' ? 'eine Stadt' : askCategory === 'Land' ? 'ein Land' : askCategory === 'Fluss' ? 'ein Fluss' : askCategory === 'Tier' ? 'ein Tier' : askCategory === 'Pflanze' ? 'eine Pflanze' : askCategory === 'Beruf' ? 'ein Beruf' : 'ein Name'} mit ${letter} ein?`
+            ];
+
+            document.getElementById('question').textContent = phrases[Math.floor(Math.random() * phrases.length)];
+            
+            let contentHtml = `
+                <div style="text-align: center; margin: 30px 0;">
+                    <div style="font-size: 5em; font-weight: bold; color: #667eea; margin: 20px 0;">${letter}</div>
+                    <div style="
+                        font-size: 2.5em;
+                        font-weight: bold;
+                        color: #f5576c;
+                        margin: 20px 0;
+                        padding: 15px;
+                        background: #fff3cd;
+                        border-radius: 15px;
+                        display: inline-block;
+                    ">
+                        ${askCategory}
+                    </div>
+                    <div style="font-size: 1.2em; color: #999; margin: 10px 0;">
+                        (Weitere Kategorien: ${categories.filter(c => c !== askCategory).join(' • ')})
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('gameContent').innerHTML = contentHtml;
+        }
+
+        // Aufnahme-Variablen für Geschichten-Modus
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let audioBlob = null;
+        let audioUrl = null;
+        let audioPlayer = null;
+        let recordingTimer = null;
+        let recordingSeconds = 0;
+
+        function generateGeschichten(difficulty) {
+            // Anzahl der Stichwörter basierend auf Schwierigkeit
+            let numWords;
+            if (difficulty === 'easy') {
+                numWords = 3;
+            } else if (difficulty === 'medium') {
+                numWords = 4;
+            } else {
+                numWords = 5;
+            }
+            
+            // Aufnahme zurücksetzen
+            stopRecording();
+            audioChunks = [];
+            audioBlob = null;
+            if (audioUrl) URL.revokeObjectURL(audioUrl);
+            audioUrl = null;
+            
+            // Zufällige Stichwörter aus verschiedenen Kategorien
+            const words = [];
+            const categories = ['personen', 'orte', 'dinge', 'tiere', 'eigenschaften', 'aktionen'];
+            const usedCategories = [];
+            
+            while (words.length < numWords && usedCategories.length < categories.length) {
+                const availableCategories = categories.filter(c => !usedCategories.includes(c));
+                const category = availableCategories[Math.floor(Math.random() * availableCategories.length)];
+                usedCategories.push(category);
+                const categoryWords = geschichtenData[category];
+                const word = categoryWords[Math.floor(Math.random() * categoryWords.length)];
+                words.push(word);
+            }
+            
+            currentQuestion = {
+                type: 'geschichten',
+                words: words,
+                answer: 'fertig'
+            };
+
+            const phrases = [
+                'Erzähl eine Geschichte mit diesen Wörtern:',
+                'Erfinde eine Geschichte! Verwende diese Wörter:',
+                'Zeit für eine Geschichte! Nutze alle diese Wörter:',
+                'Denk dir was aus mit:'
+            ];
+
+            document.getElementById('question').textContent = phrases[Math.floor(Math.random() * phrases.length)];
+            
+            let contentHtml = `
+                <div style="text-align: center; margin: 10px 0;">
+                    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 15px 0;">
+                        ${words.map(word => `
+                            <div style="
+                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                color: white;
+                                padding: 12px 20px;
+                                border-radius: 15px;
+                                font-size: 1.2em;
+                                font-weight: bold;
+                                box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+                            ">${word}</div>
+                        `).join('')}
+                    </div>
+                    
+                    <!-- Kassettenrekorder -->
+                    <div style="
+                        background: #2c2c2c;
+                        border-radius: 20px;
+                        padding: 20px;
+                        margin: 15px 0;
+                        box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+                    ">
+                        <!-- Display -->
+                        <div style="
+                            background: #1a1a2e;
+                            border-radius: 10px;
+                            padding: 10px 20px;
+                            margin-bottom: 15px;
+                            font-family: monospace;
+                            color: #00ff88;
+                            font-size: 1.1em;
+                            min-height: 40px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            gap: 15px;
+                        ">
+                            <span id="recStatus">⬛ Bereit</span>
+                            <span id="recTimer" style="color: #aaa;">00:00</span>
+                        </div>
+                        
+                        <!-- Buttons Reihe 1: Aufnahme -->
+                        <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 10px;">
+                            <button onclick="startRecording()" id="btnRecord" style="
+                                background: #e74c3c; color: white; border: none;
+                                border-radius: 50%; width: 60px; height: 60px;
+                                font-size: 1.5em; cursor: pointer;
+                                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+                            " title="Aufnehmen">⏺</button>
+                            
+                            <button onclick="stopRecording()" id="btnStop" disabled style="
+                                background: #555; color: white; border: none;
+                                border-radius: 50%; width: 60px; height: 60px;
+                                font-size: 1.5em; cursor: pointer;
+                                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+                            " title="Stopp">⏹</button>
+                            
+                            <button onclick="playRecording()" id="btnPlay" disabled style="
+                                background: #555; color: white; border: none;
+                                border-radius: 50%; width: 60px; height: 60px;
+                                font-size: 1.5em; cursor: pointer;
+                                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+                            " title="Abspielen">▶</button>
+                            
+                            <button onclick="pausePlayback()" id="btnPause" disabled style="
+                                background: #555; color: white; border: none;
+                                border-radius: 50%; width: 60px; height: 60px;
+                                font-size: 1.5em; cursor: pointer;
+                                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+                            " title="Pause">⏸</button>
+                        </div>
+                        
+                        <!-- Buttons Reihe 2: Navigation & Export -->
+                        <div style="display: flex; gap: 10px; justify-content: center;">
+                            <button onclick="rewindRecording()" id="btnRewind" disabled style="
+                                background: #555; color: white; border: none;
+                                border-radius: 50%; width: 50px; height: 50px;
+                                font-size: 1.2em; cursor: pointer;
+                                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+                            " title="Zurückspulen">⏮</button>
+                            
+                            <button onclick="exportRecording()" id="btnExport" disabled style="
+                                background: #555; color: white; border: none;
+                                border-radius: 12px; padding: 10px 20px;
+                                font-size: 1em; cursor: pointer;
+                                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+                            " title="Speichern">💾 Speichern</button>
+                        </div>
+                        
+                        <!-- Versteckter Audio-Player -->
+                        <audio id="storyAudio" style="display:none;"></audio>
+                    </div>
+                    
+                    <div style="font-size: 0.85em; color: #999; margin-top: 10px;">
+                        💡 Aufnehmen → Geschichte erzählen → Stopp → Anhören → Speichern
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('gameContent').innerHTML = contentHtml;
+        }
+        
+        function startRecording() {
+            // Prüfe ob MediaRecorder überhaupt verfügbar ist
+            if (!window.MediaRecorder) {
+                showRecordingFallback('MediaRecorder wird von diesem Browser nicht unterstützt.');
+                return;
+            }
+            
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                showRecordingFallback('Mikrofon-Zugriff nicht verfügbar.\nHinweis: Auf manchen Geräten funktioniert die Aufnahme nur wenn die Datei über einen Webserver geöffnet wird.');
+                return;
+            }
+            
+            navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+                audioChunks = [];
+                
+                // Finde unterstütztes Format
+                const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' :
+                                 MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' :
+                                 MediaRecorder.isTypeSupported('audio/ogg') ? 'audio/ogg' : '';
+                
+                mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+                
+                mediaRecorder.ondataavailable = e => {
+                    if (e.data.size > 0) audioChunks.push(e.data);
+                };
+                
+                mediaRecorder.onstop = () => {
+                    const type = mediaRecorder.mimeType || 'audio/webm';
+                    audioBlob = new Blob(audioChunks, { type: type });
+                    if (audioUrl) URL.revokeObjectURL(audioUrl);
+                    audioUrl = URL.createObjectURL(audioBlob);
+                    
+                    const player = document.getElementById('storyAudio');
+                    if (player) {
+                        player.src = audioUrl;
+                    }
+                    
+                    setButtonState('stopped');
+                    stream.getTracks().forEach(t => t.stop());
+                };
+                
+                mediaRecorder.start(100); // 100ms Chunks
+                
+                // Timer starten
+                recordingSeconds = 0;
+                setButtonState('recording');
+                recordingTimer = setInterval(() => {
+                    recordingSeconds++;
+                    const m = String(Math.floor(recordingSeconds / 60)).padStart(2, '0');
+                    const s = String(recordingSeconds % 60).padStart(2, '0');
+                    const timerEl = document.getElementById('recTimer');
+                    if (timerEl) timerEl.textContent = m + ':' + s;
+                }, 1000);
+                
+            }).catch(err => {
+                let msg = 'Mikrofon nicht verfügbar.';
+                if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                    msg = '🔒 Mikrofon-Zugriff verweigert.\nBitte in den Browser-Einstellungen erlauben.';
+                } else if (err.name === 'NotFoundError') {
+                    msg = '🎤 Kein Mikrofon gefunden.';
+                } else if (err.name === 'NotSupportedError') {
+                    msg = '⚠️ Aufnahme wird nicht unterstützt.\nHinweis: Datei muss über einen Webserver geöffnet werden.';
+                }
+                showRecordingFallback(msg);
+            });
+        }
+        
+        function showRecordingFallback(message) {
+            // Zeige Fallback: Statt Aufnahme einfach "fertig" Button
+            const status = document.getElementById('recStatus');
+            if (status) {
+                status.textContent = '⚠️ ' + message.split('\n')[0];
+                status.style.color = '#ff9900';
+            }
+            // Aktiviere trotzdem den "fertig" Weg über das Eingabefeld
+            const feedback = document.getElementById('feedback');
+            if (feedback) {
+                feedback.style.display = 'block';
+                feedback.style.background = '#667eea';
+                feedback.style.color = 'white';
+                feedback.textContent = '💬 Erzähl deine Geschichte laut! Wenn fertig: "Fertig" eingeben und Prüfen drücken.';
+            }
+        }
+        
+        function stopRecording() {
+            if (recordingTimer) {
+                clearInterval(recordingTimer);
+                recordingTimer = null;
+            }
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                // Buttons sofort aktualisieren, nicht auf onstop warten
+                const status = document.getElementById('recStatus');
+                if (status) {
+                    status.textContent = '⏳ Verarbeite...';
+                    status.style.color = '#f39c12';
+                }
+            }
+        }
+        
+        function playRecording() {
+            const player = document.getElementById('storyAudio');
+            if (player && audioUrl) {
+                player.play();
+                setButtonState('playing');
+                player.onended = () => setButtonState('stopped');
+            }
+        }
+        
+        function pausePlayback() {
+            const player = document.getElementById('storyAudio');
+            if (player) {
+                if (player.paused) {
+                    player.play();
+                    setButtonState('playing');
+                } else {
+                    player.pause();
+                    setButtonState('paused');
+                }
+            }
+        }
+        
+        function rewindRecording() {
+            const player = document.getElementById('storyAudio');
+            if (!player || !audioUrl) return;
+            
+            // Stoppe erst, dann zurück zum Anfang
+            player.pause();
+            player.currentTime = 0;
+            
+            const status = document.getElementById('recStatus');
+            if (status) {
+                status.textContent = '⏮ Zurückgespult';
+                status.style.color = '#3498db';
+            }
+            setButtonState('stopped');
+        }
+        
+        function exportRecording() {
+            if (!audioBlob) return;
+            const a = document.createElement('a');
+            a.href = audioUrl;
+            a.download = 'meine-geschichte-' + new Date().toISOString().slice(0,10) + '.webm';
+            a.click();
+        }
+        
+        function setButtonState(state) {
+            const btnRecord  = document.getElementById('btnRecord');
+            const btnStop    = document.getElementById('btnStop');
+            const btnPlay    = document.getElementById('btnPlay');
+            const btnPause   = document.getElementById('btnPause');
+            const btnRewind  = document.getElementById('btnRewind');
+            const btnExport  = document.getElementById('btnExport');
+            const recStatus  = document.getElementById('recStatus');
+            
+            if (!btnRecord) return; // Seite schon gewechselt
+            
+            const active  = 'background: #e74c3c;';
+            const ready   = 'background: #27ae60;';
+            const normal  = 'background: #555;';
+            const disable = (el) => { el.disabled = true; el.style.background = '#555'; };
+            const enable  = (el, col) => { el.disabled = false; el.style.background = col; };
+            
+            if (state === 'recording') {
+                recStatus.textContent = '🔴 Aufnahme läuft...';
+                recStatus.style.color = '#ff4444';
+                enable(btnStop, '#e74c3c');
+                disable(btnRecord); disable(btnPlay);
+                disable(btnPause); disable(btnRewind); disable(btnExport);
+            } else if (state === 'stopped') {
+                recStatus.textContent = '⏹ Aufnahme gespeichert';
+                recStatus.style.color = '#00ff88';
+                enable(btnRecord, '#e74c3c');
+                enable(btnPlay, '#27ae60');
+                enable(btnRewind, '#3498db');
+                enable(btnExport, '#f39c12');
+                disable(btnStop); disable(btnPause);
+            } else if (state === 'playing') {
+                recStatus.textContent = '▶ Wiedergabe...';
+                recStatus.style.color = '#00ff88';
+                enable(btnPause, '#f39c12');
+                enable(btnStop, '#e74c3c');
+                disable(btnPlay); disable(btnRecord);
+            } else if (state === 'paused') {
+                recStatus.textContent = '⏸ Pause';
+                recStatus.style.color = '#f39c12';
+                enable(btnPause, '#27ae60');
+                enable(btnPlay, '#27ae60');
+            }
+        }
+
+        function generateQuiz(difficulty) {
+            // Wähle zufällige Quiz-Art
+            const quizTypes = ['kennzeichen-zu-stadt', 'stadt-zu-kennzeichen', 'stadt-zu-bundesland'];
+            const quizType = quizTypes[Math.floor(Math.random() * quizTypes.length)];
+            
+            // Wähle zufällige Stadt aus der Kennzeichen-Liste
+            const randomPlate = licensePlates[Math.floor(Math.random() * licensePlates.length)];
+            
+            if (quizType === 'kennzeichen-zu-stadt') {
+                // Frage: Kennzeichen gegeben, Stadt gesucht
+                currentQuestion = {
+                    type: 'quiz',
+                    quizType: 'kennzeichen-zu-stadt',
+                    answer: randomPlate.city.toLowerCase(),
+                    kennzeichen: randomPlate.code
+                };
+                
+                const phrases = [
+                    `Welche Stadt hat das Kennzeichen ${randomPlate.code}?`,
+                    `${randomPlate.code} - Welche Stadt ist das?`,
+                    `Kennzeichen ${randomPlate.code} kommt aus?`
+                ];
+                
+                document.getElementById('question').textContent = phrases[Math.floor(Math.random() * phrases.length)];
+                
+                let contentHtml = `
+                    <div style="text-align: center; margin: 30px 0;">
+                        <div style="
+                            font-size: 4em;
+                            font-weight: bold;
+                            color: #667eea;
+                            padding: 30px;
+                            background: #f8f9fa;
+                            border-radius: 15px;
+                            display: inline-block;
+                        ">${randomPlate.code}</div>
+                        <div style="font-size: 1.2em; color: #666; margin-top: 20px;">
+                            Bundesland: ${randomPlate.state}
+                        </div>
+                    </div>
+                `;
+                document.getElementById('gameContent').innerHTML = contentHtml;
+                
+            } else if (quizType === 'stadt-zu-kennzeichen') {
+                // Frage: Stadt gegeben, Kennzeichen gesucht
+                currentQuestion = {
+                    type: 'quiz',
+                    quizType: 'stadt-zu-kennzeichen',
+                    answer: randomPlate.code.toLowerCase(),
+                    city: randomPlate.city
+                };
+                
+                const phrases = [
+                    `Welches Kennzeichen hat ${randomPlate.city}?`,
+                    `${randomPlate.city} - Welches Kennzeichen?`,
+                    `Kennzeichen von ${randomPlate.city}?`
+                ];
+                
+                document.getElementById('question').textContent = phrases[Math.floor(Math.random() * phrases.length)];
+                
+                let contentHtml = `
+                    <div style="text-align: center; margin: 30px 0;">
+                        <div style="
+                            font-size: 3em;
+                            font-weight: bold;
+                            color: #667eea;
+                            padding: 30px;
+                            background: #f8f9fa;
+                            border-radius: 15px;
+                        ">${randomPlate.city}</div>
+                        <div style="font-size: 1.2em; color: #666; margin-top: 20px;">
+                            Bundesland: ${randomPlate.state}
+                        </div>
+                    </div>
+                `;
+                document.getElementById('gameContent').innerHTML = contentHtml;
+                
+            } else {
+                // Frage: Stadt gegeben, Bundesland gesucht
+                currentQuestion = {
+                    type: 'quiz',
+                    quizType: 'stadt-zu-bundesland',
+                    answer: randomPlate.state.toLowerCase(),
+                    city: randomPlate.city
+                };
+                
+                const phrases = [
+                    `In welchem Bundesland liegt ${randomPlate.city}?`,
+                    `${randomPlate.city} - Welches Bundesland?`,
+                    `Wo liegt ${randomPlate.city}?`
+                ];
+                
+                document.getElementById('question').textContent = phrases[Math.floor(Math.random() * phrases.length)];
+                
+                let contentHtml = `
+                    <div style="text-align: center; margin: 30px 0;">
+                        <div style="
+                            font-size: 3em;
+                            font-weight: bold;
+                            color: #667eea;
+                            padding: 30px;
+                            background: #f8f9fa;
+                            border-radius: 15px;
+                        ">${randomPlate.city}</div>
+                        <div style="font-size: 1.2em; color: #666; margin-top: 20px;">
+                            Kennzeichen: ${randomPlate.code}
+                        </div>
+                    </div>
+                `;
+                document.getElementById('gameContent').innerHTML = contentHtml;
+            }
+        }
+
+        function checkAnswer() {
+            const userAnswer = document.getElementById('answerInput').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback');
+            
+            if (!userAnswer) return;
+
+            let isCorrect = false;
+
+            if (currentQuestion.type === 'kennzeichenfinder') {
+                // Suche das Kennzeichen in der Liste
+                const foundPlate = licensePlates.find(p => p.code.toLowerCase() === userAnswer);
+                
+                if (foundPlate) {
+                    isCorrect = true;
+                    feedback.className = 'feedback correct';
+                    feedback.textContent = `✅ ${foundPlate.code} = ${foundPlate.city} (${foundPlate.state})`;
+                    speak(`${foundPlate.code} kommt aus ${foundPlate.city} in ${foundPlate.state}`);
+                } else {
+                    feedback.className = 'feedback wrong';
+                    feedback.textContent = `❌ ${userAnswer.toUpperCase()} kenne ich nicht. Vielleicht vertippt?`;
+                }
+            } else if (currentQuestion.type === 'wortpuzzle') {
+                // Prüfe ob das Wort richtig ist
+                isCorrect = userAnswer === currentQuestion.answer;
+                
+                if (isCorrect) {
+                    feedback.className = 'feedback correct';
+                    feedback.textContent = `✅ Richtig! ${currentQuestion.originalWord} ist korrekt geschrieben!`;
+                    speak(`Super! ${currentQuestion.originalWord} ist richtig!`);
+                } else {
+                    feedback.className = 'feedback wrong';
+                    // Zeige wie nah der Versuch war
+                    const correctChars = userAnswer.split('').filter((char, i) => char === currentQuestion.answer[i]).length;
+                    const similarity = correctChars / currentQuestion.answer.length;
+                    
+                    if (similarity > 0.7) {
+                        feedback.textContent = `❌ Fast! Du bist ganz nah dran!`;
+                    } else if (similarity > 0.4) {
+                        feedback.textContent = `❌ Schon ganz gut! Probier nochmal!`;
+                    } else {
+                        feedback.textContent = `❌ Hmm, das passt noch nicht ganz. Versuch's nochmal!`;
+                    }
+                }
+            } else if (currentQuestion.type === 'zahlenraten') {
+                const guess = parseInt(userAnswer);
+                const distance = Math.abs(currentQuestion.target - guess);
+                
+                if (distance === 0) {
+                    isCorrect = true;
+                    feedback.className = 'feedback correct';
+                    feedback.textContent = `🎉 Genau! Die Zahl war ${currentQuestion.target}!`;
+                } else {
+                    feedback.className = 'feedback wrong';
+                    
+                    let distanceText;
+                    const max = currentQuestion.max;
+                    
+                    // Gestufte Hinweise basierend auf Distanz
+                    if (distance === 1) {
+                        distanceText = '🔥 Ganz knapp daneben!';
+                    } else if (distance <= 5) {
+                        distanceText = `🔥 Fast! Nur ${distance} daneben!`;
+                    } else if (distance <= 10) {
+                        distanceText = `🌡️ Warm! ${distance} daneben`;
+                    } else if (distance <= 20) {
+                        distanceText = `↗️ Schon näher! ${distance} daneben`;
+                    } else if (distance <= 30) {
+                        distanceText = `↗️ Du kommst näher! ${distance} daneben`;
+                    } else if (distance <= 40) {
+                        distanceText = `🔍 In die richtige Richtung! ${distance} daneben`;
+                    } else if (distance <= 50) {
+                        distanceText = `🔍 Etwa ${distance} daneben`;
+                    } else if (distance <= 100) {
+                        distanceText = `❄️ Kalt! Etwa ${Math.round(distance / 10) * 10} daneben`;
+                    } else if (distance <= 200) {
+                        distanceText = `❄️ Sehr kalt! Etwa ${Math.round(distance / 50) * 50} daneben`;
+                    } else if (distance <= 500) {
+                        distanceText = `🧊 Eiskalt! Etwa ${Math.round(distance / 100) * 100} daneben`;
+                    } else {
+                        distanceText = `🧊 Eiskalt! Über ${Math.round(distance / 100) * 100} daneben`;
+                    }
+                    
+                    // Richtungshinweis
+                    if (guess < currentQuestion.target) {
+                        distanceText += ' - höher!';
+                    } else {
+                        distanceText += ' - niedriger!';
+                    }
+                    
+                    feedback.textContent = distanceText;
+                    speak(distanceText);
+                    currentQuestion.attempts++;
+                    return;
+                }
+            } else if (currentQuestion.type === 'raetsel') {
+                isCorrect = userAnswer === currentQuestion.answer;
+                if (isCorrect) {
+                    feedback.className = 'feedback correct';
+                    feedback.textContent = `✅ Super! ${currentQuestion.riddle.explanation}`;
+                } else {
+                    feedback.className = 'feedback wrong';
+                    feedback.textContent = `❌ Nee, leider nicht. ${currentQuestion.riddle.explanation}`;
+                }
+            } else if (currentQuestion.type === 'stadtlandfluss') {
+                // Prüfe ob Antwort mit richtigem Buchstaben beginnt
+                const startsWithLetter = userAnswer.startsWith(currentQuestion.letter.toLowerCase());
+                
+                // Prüfe ob Antwort in der Liste ist
+                const isInList = currentQuestion.possibleAnswers.includes(userAnswer);
+                
+                if (startsWithLetter) {
+                    isCorrect = true;
+                    feedback.className = 'feedback correct';
+                    if (isInList) {
+                        feedback.textContent = `✅ Richtig! ${userAnswer.charAt(0).toUpperCase() + userAnswer.slice(1)} passt super!`;
+                    } else {
+                        feedback.textContent = `✅ Gut! ${userAnswer.charAt(0).toUpperCase() + userAnswer.slice(1)} fängt mit ${currentQuestion.letter} an!`;
+                    }
+                } else {
+                    feedback.className = 'feedback wrong';
+                    const example = currentQuestion.possibleAnswers[0];
+                    feedback.textContent = `❌ Das fängt nicht mit ${currentQuestion.letter} an. Zum Beispiel: ${example}`;
+                }
+            } else if (currentQuestion.type === 'geschichten') {
+                // Bei Geschichten gibt es keine falsche Antwort!
+                // Akzeptiere verschiedene Varianten von "fertig"
+                const finishWords = ['fertig', 'done', 'ok', 'ende', 'finish', 'aus', 'weiter', 'nächste'];
+                const isFinished = finishWords.some(word => userAnswer.includes(word));
+                
+                if (isFinished) {
+                    isCorrect = true;
+                    feedback.className = 'feedback correct';
+                    const compliments = [
+                        '🌟 Toll erzählt!',
+                        '📖 Super Geschichte!',
+                        '✨ Das war spannend!',
+                        '🎭 Kreativ!',
+                        '👏 Klasse gemacht!'
+                    ];
+                    feedback.textContent = compliments[Math.floor(Math.random() * compliments.length)];
+                } else {
+                    // Wenn was anderes eingegeben wird, einfach ignorieren
+                    feedback.className = 'feedback';
+                    feedback.style.display = 'block';
+                    feedback.style.background = '#667eea';
+                    feedback.textContent = '💬 Erzähl weiter! Sag "fertig" wenn du fertig bist.';
+                    return;
+                }
+            } else if (currentQuestion.type === 'quiz') {
+                // Quiz-Fragen prüfen
+                isCorrect = userAnswer === currentQuestion.answer;
+                
+                if (isCorrect) {
+                    feedback.className = 'feedback correct';
+                    feedback.textContent = '✅ Richtig!';
+                } else {
+                    feedback.className = 'feedback wrong';
+                    const correctAnswer = currentQuestion.answer.charAt(0).toUpperCase() + currentQuestion.answer.slice(1);
+                    feedback.textContent = `❌ Nee, richtig ist: ${correctAnswer}`;
+                }
+            } else {
+                const numericAnswer = parseFloat(userAnswer);
+                isCorrect = numericAnswer === currentQuestion.answer || userAnswer === String(currentQuestion.answer).toLowerCase();
+                
+                if (isCorrect) {
+                    feedback.className = 'feedback correct';
+                    
+                    // Speed-Bonus für 1×1
+                    let bonusText = '';
+                    let bonusPoints = 0;
+                    
+                    if (currentQuestion.type === 'einmaleins' && currentQuestion.startTime) {
+                        const timeElapsed = (Date.now() - currentQuestion.startTime) / 1000; // in Sekunden
+                        
+                        if (timeElapsed <= 3) {
+                            bonusText = ' 🚀 BLITZSCHNELL! +50 Bonus!';
+                            bonusPoints = 50;
+                        } else if (timeElapsed <= 5) {
+                            bonusText = ' ⚡ Schnell! +20 Bonus!';
+                            bonusPoints = 20;
+                        } else if (timeElapsed <= 8) {
+                            bonusText = ' ✨ Zügig! +10 Bonus!';
+                            bonusPoints = 10;
+                        }
+                    }
+                    
+                    const phrases = [
+                        '🎉 Richtig!',
+                        '✅ Super!',
+                        '🌟 Genau!',
+                        '👍 Klasse!'
+                    ];
+                    feedback.textContent = phrases[Math.floor(Math.random() * phrases.length)] + bonusText;
+                    
+                    // Bonus-Punkte zur Score hinzufügen
+                    if (bonusPoints > 0) {
+                        score += bonusPoints;
+                    }
+                } else {
+                    feedback.className = 'feedback wrong';
+                    feedback.textContent = `❌ Nochmal versuchen!`;
+                }
+            }
+
+            if (isCorrect) {
+                correct++;
+                streak++;
+                score += 10 * streak;
+                
+                const phrases = [
+                    'Super gemacht!',
+                    'Klasse!',
+                    'Prima!',
+                    'Genau richtig!',
+                    'Das war toll!'
+                ];
+                speak(phrases[Math.floor(Math.random() * phrases.length)]);
+            } else {
+                streak = 0;
+                const phrases = [
+                    'Schade, das war leider falsch',
+                    'Nicht ganz, versuch\'s nochmal',
+                    'Oh nee, probier\'s noch mal'
+                ];
+                speak(phrases[Math.floor(Math.random() * phrases.length)]);
+            }
+
+            updateScoreBoard();
+            
+            setTimeout(() => {
+                if (isCorrect) {
+                    generateQuestion();
+                }
+            }, 2000);
+        }
+
+        function updateScoreBoard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('correct').textContent = correct;
+            document.getElementById('streak').textContent = streak;
+        }
+
+        function speak(text) {
+            const volume = speechSettings.volume / 100;
+            if (volume === 0 || !speechSynthesis) return;
+
+            speechSynthesis.cancel();
+            
+            setTimeout(() => {
+                try {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'de-DE';
+                    utterance.volume = volume;
+                    utterance.rate = speechSettings.rate / 100;
+                    utterance.pitch = speechSettings.pitch / 100;
+                    
+                    const voices = speechSynthesis.getVoices();
+                    
+                    // NUR lokale Stimmen - keine Online-Stimmen die Netz brauchen!
+                    const localVoices = voices.filter(v => v.localService === true);
+                    
+                    // Beste lokale deutsche Stimme
+                    let germanVoice = localVoices.find(v => v.lang.startsWith('de'));
+                    
+                    // Falls keine lokale deutsche Stimme, nimm irgendeine lokale
+                    if (!germanVoice && localVoices.length > 0) {
+                        germanVoice = localVoices[0];
+                    }
+                    
+                    // Absoluter Fallback: irgendeine deutsche Stimme
+                    if (!germanVoice) {
+                        germanVoice = voices.find(v => v.lang.startsWith('de'));
+                    }
+                    
+                    if (germanVoice) {
+                        utterance.voice = germanVoice;
+                    }
+                    
+                    utterance.onerror = function(event) {
+                        // Stille Fehlerbehandlung - kein console.error
+                        if (event.error !== 'synthesis-failed' && event.error !== 'interrupted') {
+                            console.log('Sprachausgabe nicht verfügbar:', event.error);
+                        }
+                    };
+                    
+                    speechSynthesis.speak(utterance);
+                } catch (error) {
+                    // Ignoriere Fehler - Sprachausgabe ist optional
+                }
+            }, 100);
+        }
+
+        function toggleVoice() {
+            if (isListening) {
+                stopListening();
+            } else {
+                startListening();
+            }
+        }
+
+        function startListening() {
+            if (recognition) {
+                isListening = true;
+                document.getElementById('voiceBtn').classList.add('listening');
+                try {
+                    recognition.start();
+                    speak('Ich höre zu');
+                } catch (e) {
+                    console.error('Fehler beim Starten:', e);
+                    stopListening();
+                }
+            }
+        }
+
+        function stopListening() {
+            isListening = false;
+            document.getElementById('voiceBtn').classList.remove('listening');
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch (e) {
+                    // Ignoriere Fehler beim Stoppen
+                }
+            }
+        }
+    </script>
+</body>
+</html>
